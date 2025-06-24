@@ -1,0 +1,145 @@
+.product-detels-image{
+    width: 70%;
+    height: 500px;
+    object-fit: cover !important;
+}
+
+
+@media (max-width: 577px)  {
+.product-detels-image{
+    width: 100%;
+    height: 500px;
+    object-fit: cover ;
+}
+}
+
+/* شاشة كبيرة - ديسكتوب */
+@media (max-width: 993px) {
+.product-detels-image{
+    width: 100%;
+    height: 500px;
+    object-fit: cover ;
+}
+}
+
+
+/* General styling for better font rendering and responsiveness */
+body {
+    font-family: 'Arial', sans-serif; /* Choose a professional font */
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Main Product Image */
+
+
+/* Thumbnail images */
+.img-thumbnail {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #dee2e6; /* Default border */
+}
+
+.img-thumbnail:hover {
+    transform: translateY(-3px); /* Lift effect on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.img-thumbnail.border-primary {
+    border-color: #d81b60 !important; /* Bootstrap primary color */
+    border-width: 3px !important;
+}
+
+/* Buttons */
+.btn-primary, .btn-success {
+    border-radius: 0.5rem; /* Rounded corners for buttons */
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-success:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Tabs Styling */
+.nav-tabs .nav-link {
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: -1px; /* Overlap border with content */
+    background-color: #f8f9fa; /* Light grey background for tabs */
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff; /* Active tab has white bottom border */
+    color: #d81b60; /* Primary color for active tab */
+    font-weight: bold;
+}
+
+.tab-content {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none; /* Remove top border as it's handled by tabs */
+    border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners */
+    padding: 1.5rem !important; /* Increase padding */
+}
+
+/* Review Section */
+.review-item {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+/* Form Styling */
+.form-control, .form-select {
+    border-radius: 0.3rem;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem; /* Better padding */
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #d81b60;
+    box-shadow: 0 0 0 0.25rem #d81b60;
+}
+
+/* Similar Products Card */
+.product-card {
+    border-radius: 0.75rem; /* More rounded corners */
+    overflow: hidden; /* Ensures image corners are rounded */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px); /* Lift effect for cards */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* More prominent shadow on hover */
+}
+
+.product-card-image {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+/* Toaster styles (optional, can be customized further) */
+.notefection {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 0.95rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .product-main-image {
+        max-height: 400px;
+    }
+    .d-flex.flex-wrap.justify-content-md-start {
+        justify-content: center !important; /* Center thumbnails on small screens */
+    }
+    .btn-lg {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+}
