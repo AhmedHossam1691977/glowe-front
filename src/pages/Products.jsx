@@ -113,7 +113,7 @@ export default function Products() {
         if (data.message === "success") {
           toast.success("تم الإزالة", {
             position: "top-center",
-            className: "border border-danger notefection p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
+            className: "border border-danger  p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
             duration: 1000,
             icon: "🗑️",
           });
@@ -136,8 +136,7 @@ export default function Products() {
     }
   }
 
-  const isInWishlist = (productId) =>
-    wishlistItems.some((item) => item._id === productId);
+  const isInWishlist = (productId) => wishlistItems.some((item) => item._id === productId);
 
   async function addToChart(id, productImages, slideIndex) {
     try {
@@ -184,31 +183,32 @@ export default function Products() {
     // إزالة autoplay لأننا لا نريده
   });
 
-  return (
-    <div className="container">
+  return <>
+  
+    <div className="container" id="products">
       <div className="row">
-        <div className="col-md-12">
-          <div className="contain">
-            <img src={image} className="img-fluid produc-slider-image" alt="مستحضرات تجميل" />
-            <div className="textttt text-center">
-              <h2>اكتشفي جمالك الحقيقي مع مستحضرات الميك أب...</h2>
-              <div className="text-center w-100">
-                <Link className="text-black fs-3" to={"/"}>الرئيسية</Link>
-                <span className="fs-3 text-black">/</span>
-                <Link className="text-black fs-3" to={"/products"}>المنتجات</Link>
+         <div className="col-md-12">
+          <div className="product-image-container position-relative overflow-hidden">
+            <img src={image} className="img-fluid w-100 h-100 object-fit-cover" alt="مستحضرات تجميل" />
+            <div className="product-text-overlay d-flex flex-column justify-content-center align-items-center text-center p-3">
+              <h2 className="header-title mb-3">اكتشفي جمالك الحقيقي مع مستحضرات الميك أب...</h2>
+              <div className="breadcrumb-links">
+                <Link className="breadcrumb-link" to={"/"}>الرئيسية</Link>
+                <span className="breadcrumb-separator">/</span>
+                <Link className="breadcrumb-link" to={"/products"}>المنتجات</Link>
               </div>
             </div>
           </div>
         </div>
 
         <div className="col-md-12 my-4">
-          <div className="sort-section mb-4 d-flex align-items-center">
+          <div className="sort-section mb-4">
             <span className="fs-5 me-2 fw-bold">ترتيب حسب</span>
-            <div className="d-flex flex-wrap align-items-center">
+            <div className="d-flex flex-wrap align-items-center sort-options">
               {sortOptions.map(({ label, value }) => (
                 <button
                   key={value}
-                  className={`sort-option-btn m-3 ${activeSort === value ? "active" : ""}`}
+                  className={`sort-option-btn  ${activeSort === value ? "active" : ""}`}
                   onClick={() => {
                     setActiveSort(value);
                     setMinPrice("");
@@ -254,84 +254,88 @@ export default function Products() {
 
               const currentSlideIndex = activeSlideIndices[product._id] || 0;
 
-              return (
-                <div key={product._id} className="col-md-6 col-lg-3 mb-4">
-                  <div className="card product-card h-100 position-relative">
-                    <div className="position-relative product-image-wrapper">
-                      {/* استخدام Swiper بدلًا من Slider */}
-                      <Swiper {...productSwiperSettings(product._id)}>
-                        {allProductImages.map((imgSrc, index) => (
-                          <SwiperSlide key={index}>
-                            <img src={imgSrc} className="card-img-top product-image" alt={`${product.title} - ${index + 1}`} />
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
+            return (
+  <div key={product._id} className="col-6 col-md-6 col-lg-3 mb-4">
+      <div className="card product-card h-100 position-relative">
+      <div className="position-relative product-image-wrapper">
+        {/* استخدام Swiper بدلًا من Slider */}
+        <Swiper {...productSwiperSettings(product._id)}>
+          {allProductImages.map((imgSrc, index) => (
+            <SwiperSlide key={index}>
+              {/* تصغير الصورة أكتر على الموبايل */}
+              <img src={imgSrc} className="card-img-top product-image img-fluid" alt={`${product.title} - ${index + 1}`}  />
+            </SwiperSlide>
+          ))}
+        </Swiper>
 
-                      <div className="which-sp w-100 position-absolute top-0 start-0 p-2 d-flex flex-column align-items-start z-3">
-                        <span className="cursor-pointer mb-2" onClick={() => toggleWishlist(product._id)}>
-                          {isInWishlist(product._id) ? (
-                            <FaHeart className="fs-2 text-danger cursor-pointer" />
-                          ) : (
-                            <FaRegHeart className="fs-2 text-white cursor-pointer" />
-                          )}
-                        </span>
-                        <Link to={`/productDetel/${product._id}`}>
-                          <span className="cursor-pointer">
-                            <AiOutlineEye className="fs-2 text-white" />
-                          </span>
-                        </Link>
-                      </div>
-                      {product.priceAfterDiscount && (
-                        <span className="discount-badge">
-                          خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
-                        </span>
-                      )}
-                    </div>
+        <div className="which-sp w-100 position-absolute top-0 start-0 p-2 d-flex flex-column align-items-start z-3">
+          <span className="cursor-pointer mb-1" onClick={() => toggleWishlist(product._id)}>
+            {isInWishlist(product._id) ? (
+              <FaHeart className="fs-4 text-danger cursor-pointer" />
+            ) : (
+              <FaRegHeart className="fs-4 text-white cursor-pointer" />
+            )}
+          </span>
+          <Link to={`/productDetel/${product._id}`}>
+            <span className="cursor-pointer">
+              <AiOutlineEye className="fs-4 text-white" />
+            </span>
+          </Link>
+        </div>
+        {product.priceAfterDiscount && (
+          <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
+            خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
+          </span>
+        )}
+      </div>
 
-                    <div className="card-body my-3">
-                      <h6 className="card-subtitle mb-1 text-muted fs-5 fw-bold">{product.title?.split(" ").slice(0, 2).join(" ")}</h6>
-                      <h5 className="card-title fs-5 mb-2">
-                        {product.description?.split(" ").slice(0, 3).join(" ")}
-                      </h5>
+      <div className="card-body py-2">
+        {/* تصغير حجم الخط للعناوين على الموبايل */}
+        <h6 className="card-subtitle mb-1 text-muted fs-6 fw-bold">{product.title?.split(" ").slice(0, 3).join(" ")}</h6>
+        <h5 className="card-title fs-6 mb-1">
+          {/* {product.description?.split(" ").slice(0, 2).join(" ")} */}
+        </h5>
 
-                      <div className="product-price mb-1 d-flex align-items-center">
-                        <span className="text-danger fs-5 fw-bold">
-                          {product.priceAfterDiscount ? `${product.priceAfterDiscount} ج.م` : `${product.price} ج.م`}
-                        </span>
-                        {product.priceAfterDiscount && (
-                          <span className="text-decoration-line-through mx-2 text-muted ms-2 fs-6">
-                            {product.price} ج.م
-                          </span>
-                        )}
-                      </div>
+        <div className="product-price mb-1 d-flex align-items-center">
+          <span className="text-danger fs-6 fw-bold">
+            {product.priceAfterDiscount ? `${product.priceAfterDiscount} ج.م` : `${product.price} ج.م`}
+          </span>
+          {product.priceAfterDiscount && (
+            <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
+              {product.price} ج.م
+            </span>
+          )}
+        </div>
 
-                      <div className="product-rating mb-3 fs-5 d-flex align-items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            style={{
-                              color: i < Math.round(product.rateAvg || 0) ? "#ffc107" : "#e4e5e9",
-                              fontSize: "20px",
-                            }}
-                          >
-                            ★
-                          </span>
-                        ))}
-                        <span className="ms-2 text-muted">({product.rateCount || 0})</span>
-                      </div>
+        <div className="product-rating mb-2 fs-6 d-flex align-items-center">
+          {[...Array(5)].map((_, i) => (
+            <span
+              key={i}
+              style={{
+                color: i < Math.round(product.rateAvg || 0) ? "#ffc107" : "#e4e5e9",
+                fontSize: "16px",
+              }}
+            >
+              ★
+            </span>
+          ))}
+          <span className="ms-1 text-muted fs-7">({product.rateCount || 0})</span>
+        </div>
 
-                      <button onClick={() => addToChart(product._id, allProductImages, currentSlideIndex)} className="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
-                        <BsCartCheckFill className="fs-5" />
-                        أضف إلى السلة
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
+        <button onClick={() => addToChart(product._id, allProductImages, currentSlideIndex)} className="btn  w-100 d-flex align-items-center justify-content-center gap-1 bnt-cart" >
+          <BsCartCheckFill className="fs-6" />
+          <span className="text">أضف إلى السلة</span>
+        </button>
+      </div>
+    </div>
+  </div>
+);
             })}
           </div>
         </div>
       </div>
     </div>
-  );
+  
+
+  </>
 }

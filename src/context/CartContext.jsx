@@ -23,29 +23,20 @@ export default function CartContextProvider(props) {
     }, []);
 
 
-    useEffect(() => {
-        async function gitData() {
-            let { data } = await getAllCartData();
-            setCartCount(data.cartItems);
-            
-        }
-
-        // تحقق من وجود token قبل استدعاء gitData
-        if (localStorage.getItem("token")) {
-            gitData();
-        } else {
-            setCartCount(0); // إذا لم يكن هناك token، يتم تعيين cartCount إلى 0
-        }
-    }, [localStorage.getItem("token")],cartCount);
 
 
-    async function getAllCartData() { 
-        return await axios.get(`${basUrl}/api/v1/cart`, {
-            headers: {
-                'token': localStorage.getItem("token")
-            }
-        });
-    }
+ async function getAllCartData() {
+  try {
+    const response = await axios.get(`${basUrl}/api/v1/cart`, {
+      headers: {
+        token: localStorage.getItem("token")
+      }
+    });
+    return response;
+  } catch (error) {
+    return null; // أو تقدر ترجع {} حسب حالتك
+  }
+}
 
     function deletAllCartData() {
         return axios.delete(`${basUrl}/api/v1/cart`, {
@@ -55,12 +46,13 @@ export default function CartContextProvider(props) {
         });
     }
 
-   function addCart(id, image) {
+   function addCart(id, image ,quantity) {
     console.log(id);
-    
+  
     return axios.post(`${basUrl}/api/v1/cart`, { 
         "product": id,
-        "image": image
+        "image": image,
+        "quantity": quantity
     }, {
         headers: {
             'token': localStorage.getItem("token")

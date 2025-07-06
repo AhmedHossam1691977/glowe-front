@@ -1,20 +1,16 @@
-/* Base Styles for #products section */
-#products .product-image {
+/* Base Styles for #product-of-subcategory section */
+#product-of-subcategory .product-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
   border-radius: 10px;
 }
 
-#products .contain {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 10px;
-}
+
+
 
 /* Text on top of image (non-overlapping) */
-#products .textttt {
+#product-of-subcategory .textttt {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -33,7 +29,7 @@
 }
 
 /* Product Card Hover Effects */
-#products .product-card {
+#product-of-subcategory .product-card {
   border: none;
   border-radius: 8px;
   overflow: hidden;
@@ -41,13 +37,13 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-#products .product-card:hover {
+#product-of-subcategory .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Product Image Container & Hover Effects */
-#products .product-image-container {
+#product-of-subcategory .product-image-container {
   position: relative;
   overflow: hidden;
   border-radius: 15px; /* Consistent with slider */
@@ -56,7 +52,7 @@
   height: 0; /* Important for padding-bottom aspect ratio */
 }
 
-#products .product-image-container img {
+#product-of-subcategory .product-image-container img {
   position: absolute;
   top: 0;
   left: 0;
@@ -68,27 +64,27 @@
   transition: transform 0.5s ease; /* Smooth transition for hover */
 }
 
-#products .product-card:hover .product-image {
+#product-of-subcategory .product-card:hover .product-image {
   transform: scale(1.05);
 }
 
 /* Add To Bag Button Styles & Hover */
-#products .add-to-bag-btn {
-  background-color: #00ff8c;
+#product-of-subcategory .add-to-bag-btn {
+  background-color: #ff007f;
   color: white;
   border: none;
   padding: 10px;
   transition: all 0.3s ease;
 }
 
-#products .add-to-bag-btn:hover {
+#product-of-subcategory .add-to-bag-btn:hover {
   background-color: rgba(0, 0, 0, 0.527); /* Corrected potential typo if it was meant to be a valid color */
   color: rgb(255, 255, 255);
   transform: translateY(-2px);
 }
 
 /* Wishlist Button */
-#products .wishlist-btn {
+#product-of-subcategory .wishlist-btn {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -107,11 +103,11 @@
 }
 
 /* Discount Badge */
-#products .discount-badge {
+#product-of-subcategory .discount-badge {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #ff007f;
+  background: #ff0000;
   color: white;
   padding: 3px 8px;
   border-radius: 4px;
@@ -121,22 +117,22 @@
 }
 
 /* Star Rating */
-#products .star-filled {
+#product-of-subcategory .star-filled {
   color: #ffc107;
 }
 
-#products .star-empty {
+#product-of-subcategory .star-empty {
   color: #fafafa;
 }
 
 /* Product Header Section Styling (Similar to slider) */
-#products .product-header-section {
+#product-of-subcategory .product-header-section {
   margin-top: 2rem;
   margin-bottom: 2rem;
 }
 
 /* Text Overlay for Product Header */
-#products .product-text-overlay {
+#product-of-subcategory .product-text-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -152,35 +148,35 @@
   padding: 15px;
 }
 
-#products .product-text-overlay .header-title {
+#product-of-subcategory .product-text-overlay .header-title {
   font-size: 2.5rem; /* Larger font for the main title */
   font-weight: bold;
   color: #f8f9fa; /* Off-white for clarity */
 }
 
 /* Breadcrumb Links */
-#products .product-text-overlay .breadcrumb-links {
+#product-of-subcategory .product-text-overlay .breadcrumb-links {
   font-size: 1.2rem;
   margin-top: 10px;
 }
 
-#products .product-text-overlay .breadcrumb-link {
+#product-of-subcategory .product-text-overlay .breadcrumb-link {
   color: #fff;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-#products .product-text-overlay .breadcrumb-link:hover {
+#product-of-subcategory .product-text-overlay .breadcrumb-link:hover {
   color: #ff007f; /* Your brand color on hover */
 }
 
-#products .product-text-overlay .breadcrumb-separator {
+#product-of-subcategory .product-text-overlay .breadcrumb-separator {
   color: #fff;
   margin: 0 10px;
 }
 
 /* Sort Option Buttons - Professional Design */
-#products .sort-option-btn {
+#product-of-subcategory .sort-option-btn {
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
   color: #495057;
@@ -196,7 +192,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-#products .sort-option-btn:hover {
+#product-of-subcategory .sort-option-btn:hover {
   background-color: #e9ecef;
   border-color: #ced4da;
   color: #212529;
@@ -204,7 +200,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#products .sort-option-btn.active {
+#product-of-subcategory .sort-option-btn.active {
   background-color: #ff007f;
   border-color: #ff007f;
   color: #fff;
@@ -214,7 +210,7 @@
 }
 
 /* Adjustments for price input fields */
-#products .sort-section .form-control {
+#product-of-subcategory .sort-section .form-control {
   max-width: 120px;
   margin: 5px 0 5px 10px;
   border-radius: 8px;
@@ -222,13 +218,13 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
 }
 
-#products .sort-section .form-control:focus {
+#product-of-subcategory .sort-section .form-control:focus {
   border-color: #ff007f !important;
   box-shadow: 0 0 0 0.25rem rgb(216, 27, 96) !important;
 }
 
 /* Swiper Pagination Dots Styling */
-#products .swiper-pagination-bullet {
+#product-of-subcategory .swiper-pagination-bullet {
   background-color: #ffffff !important;
   opacity: 1 !important;
   width: 10px;
@@ -236,7 +232,7 @@
   margin: 0 4px;
 }
 
-#products .swiper-pagination-bullet-active {
+#product-of-subcategory .swiper-pagination-bullet-active {
   background-color: #ff007f !important;
   opacity: 1;
   width: 12px;
@@ -244,13 +240,13 @@
 }
 
 /* Swiper Navigation Arrows */
-#products .swiper-button-next,
-#products .swiper-button-prev {
+#product-of-subcategory .swiper-button-next,
+#product-of-subcategory .swiper-button-prev {
   color: #ff007f !important;
 }
 
 /* Swiper Pagination Positioning */
-#products .swiper-pagination {
+#product-of-subcategory .swiper-pagination {
   bottom: 10px !important;
   z-index: 10;
 }
@@ -259,7 +255,7 @@
 
 /* Media Query for larger phones/small tablets (max-width: 993px) */
 @media (max-width: 993px) {
-  #products .textttt {
+  #product-of-subcategory .textttt {
     font-size: 2rem;
     max-width: 60%;
     left: auto; /* Changed from right: auto to left: auto for better control */
@@ -271,7 +267,7 @@
 
 /* Media Query for smaller phones (max-width: 577px) */
 @media (max-width: 577px) {
-  #products .textttt {
+  #product-of-subcategory .textttt {
     font-size: 1.5rem;
     max-width: 70%;
     left: auto; /* Changed from right: auto to left: auto for better control */
@@ -280,30 +276,27 @@
     text-align: center;
   }
 
-  #products .sort-option-btn {
-  padding: 5px !important;
-  margin: 5px ;
-}
-.sort-options{
-  display: flex;
-  justify-content: space-around;
-}
-
+  #product-of-subcategory .sort-option-btn {
+    padding: 5px !important;
+    margin: 5px;
+  }
+  .sort-options {
+    display: flex;
+    justify-content: space-around;
+  }
 }
 
 /* Media Query for Tablets (min-width: 768px) */
 @media (min-width: 768px) {
-  #products .product-image-container {
+  #product-of-subcategory .product-image-container {
     padding-bottom: 25%; /* Slightly taller for tablets */
   }
 
-
-
-  #products .product-text-overlay .header-title {
+  #product-of-subcategory .product-text-overlay .header-title {
     font-size: 3rem;
   }
 
-  #products .product-text-overlay .breadcrumb-links {
+  #product-of-subcategory .product-text-overlay .breadcrumb-links {
     font-size: 1.3rem;
   }
 }
@@ -311,181 +304,208 @@
 /* Media Query for Mobile Devices (max-width: 767.98px) */
 @media (max-width: 767.98px) {
   /* Product Card Adjustments */
-  #products .product-card .product-image {
+  #product-of-subcategory .product-card .product-image {
     max-height: 150px !important;
   }
 
-  #products .product-card .card-body {
+  #product-of-subcategory .product-card .card-body {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
 
   /* Font Size Adjustments */
-  #products .product-card .card-subtitle {
+  #product-of-subcategory .product-card .card-subtitle {
     font-size: 0.9rem !important;
   }
 
-  #products .product-card .card-title {
+  #product-of-subcategory .product-card .card-title {
     font-size: 1rem !important;
   }
 
-  #products .product-card .product-price span {
+  #product-of-subcategory .product-card .product-price span {
     font-size: 1rem !important;
   }
 
-  #products .product-card .product-price .text-decoration-line-through {
+  #product-of-subcategory .product-card .product-price .text-decoration-line-through {
     font-size: 0.8rem !important;
   }
 
-  #products .product-card .product-rating span {
+  #product-of-subcategory .product-card .product-rating span {
     font-size: 16px !important;
   }
 
-  #products .product-card .product-rating .ms-1 {
+  #product-of-subcategory .product-card .product-rating .ms-1 {
     font-size: 0.8rem !important;
   }
 
-  #products .product-card .discount-badge {
-    font-size: 0.50rem !important;
+  #product-of-subcategory .product-card .discount-badge {
+    font-size: 0.5rem !important; /* Changed from 0.50rem to 0.5rem for consistency */
     font-weight: bold;
     padding: 0.2rem 0.4rem;
   }
 
   /* Icons Adjustment */
-  #products .product-card .which-sp .fs-4 {
+  #product-of-subcategory .product-card .which-sp .fs-4 {
     font-size: 1.5rem !important;
   }
 
   /* Button Adjustment */
-  #products .product-card .btn {
-    font-size: .1rem !important;
+  #product-of-subcategory .product-card .btn {
+    font-size: 0.9rem !important; /* Adjusted to a more reasonable size for mobile buttons */
     padding: 0.3rem 0.75rem !important;
   }
 
-  #products .product-card .btn .text {
-    font-size: .6rem !important;
+  #product-of-subcategory .product-card .btn .text {
+    font-size: 0.8rem !important; /* Adjusted for better readability */
     font-weight: bold;
   }
 
-  #products .product-card .btn .fs-6 {
+  #product-of-subcategory .product-card .btn .fs-6 {
     font-size: 1rem !important;
   }
 
   /* Swiper Pagination for Mobile */
-  #products .swiper-pagination-bullet {
+  #product-of-subcategory .swiper-pagination-bullet {
     width: 6px !important;
     height: 6px !important;
     margin: 0 2px !important;
   }
 
-  #products .swiper-pagination-bullet-active {
+  #product-of-subcategory .swiper-pagination-bullet-active {
     width: 12px;
     height: 12px;
   }
-  
+
   /* Product Header Image Container Adjustments for small screens */
-  #products .product-image-container {
+  #product-of-subcategory .product-image-container {
     padding-bottom: 40%; /* Taller on phones */
   }
 
-  #products .product-text-overlay .header-title {
+  #product-of-subcategory .product-text-overlay .header-title {
     font-size: 1.8rem;
   }
 
-  #products .product-text-overlay .breadcrumb-links {
+  #product-of-subcategory .product-text-overlay .breadcrumb-links {
     font-size: 1rem;
   }
 }
 
 /* Media Query for Extra small devices (portrait phones, less than 576px) */
 @media (max-width: 575.98px) {
-  #products .product-card .product-image {
+  #product-of-subcategory .product-card .product-image {
     max-height: 180px; /* Can be reduced further for very small screens */
   }
 
-  #products .product-card .card-subtitle,
-  #products .product-card .card-title,
-  #products .product-card .product-price span,
-  #products .product-card .product-rating span,
-  #products .product-card .btn {
+  #product-of-subcategory .product-card .card-subtitle,
+  #product-of-subcategory .product-card .card-title,
+  #product-of-subcategory .product-card .product-price span,
+  #product-of-subcategory .product-card .product-rating span,
+  #product-of-subcategory .product-card .btn {
     font-size: 0.8rem !important;
   }
 
-  #products .product-card .btn .text {
-    font-size: .6rem !important;
+  #product-of-subcategory .product-card .btn .text {
+    font-size: 0.7rem !important; /* Adjusted for better readability */
     font-weight: bold;
   }
 
-  #products .product-card .btn .fs-6 {
+  #product-of-subcategory .product-card .btn .fs-6 {
     font-size: 1rem !important;
   }
 
   /* Product Header Image Container Adjustments for extra small screens */
-  #products .product-image-container {
+  #product-of-subcategory .product-image-container {
     padding-bottom: 50%; /* Even taller on very small phones */
   }
 
-  #products .product-text-overlay .header-title {
+  #product-of-subcategory .product-text-overlay .header-title {
     font-size: 1.5rem;
   }
 
-  #products .product-text-overlay .breadcrumb-links {
+  #product-of-subcategory .product-text-overlay .breadcrumb-links {
     font-size: 0.9rem;
   }
 }
 
 /* Media Query for very small devices (max-width: 399.98px) */
 @media (max-width: 399.98px) {
-  #products .product-card .product-image {
+  #product-of-subcategory .product-card .product-image {
     max-height: 160px !important; /* Adjust image height for very small screens */
   }
 
-
-
-  #products .product-card .card-subtitle,
-  #products .product-card .card-title,
-  #products .product-card .product-price span,
-  #products .product-card .product-price .text-decoration-line-through,
-  #products .product-card .product-rating span,
-  #products .product-card .product-rating .ms-1,
-  #products .product-card .btn .text {
+  #product-of-subcategory .product-card .card-subtitle,
+  #product-of-subcategory .product-card .card-title,
+  #product-of-subcategory .product-card .product-price span,
+  #product-of-subcategory .product-card .product-price .text-decoration-line-through,
+  #product-of-subcategory .product-card .product-rating span,
+  #product-of-subcategory .product-card .product-rating .ms-1 {
     font-size: 0.7rem !important; /* Further reduce font sizes */
   }
 
-  #products .product-card .btn ,
-   #products .product-card .btn .text{
-    font-size: 0.5rem !important;
-   }
+  #product-of-subcategory .product-card .btn,
+  #product-of-subcategory .product-card .btn .text {
+    font-size: 0.5rem !important; /* Adjusted for readability and smaller button size */
+  }
 
-  #products .product-card .discount-badge {
+  #product-of-subcategory .product-card .discount-badge {
     font-size: 0.45rem !important;
     padding: 0.15rem 0.3rem !important;
   }
 
-  #products .product-card .which-sp .fs-4,
-  #products .product-card .btn .fs-6 {
+  #product-of-subcategory .product-card .which-sp .fs-4,
+  #product-of-subcategory .product-card .btn .fs-6 {
     font-size: 1.2rem !important; /* Adjust icon sizes */
   }
 
-  #products .product-card .btn {
+  #product-of-subcategory .product-card .btn {
     padding: 0.2rem 0.5rem !important; /* Further reduce button padding */
   }
 
-  #products .product-image-container {
+  #product-of-subcategory .product-image-container {
     padding-bottom: 60%; /* Even taller aspect ratio for header image on very small screens */
   }
 
-  #products .product-text-overlay .header-title {
+  #product-of-subcategory .product-text-overlay .header-title {
     font-size: 1.2rem;
   }
 
-  #products .product-text-overlay .breadcrumb-links {
+  #product-of-subcategory .product-text-overlay .breadcrumb-links {
     font-size: 0.8rem;
   }
 
-  #products .textttt {
+  #product-of-subcategory .textttt {
     font-size: 1.2rem;
     max-width: 80%;
     margin: 0 auto 5px auto;
   }
+}
+
+
+.subCatigory-Of-Catigory{
+  font-size: 1.2rem;
+  color: #000; /* Your brand color */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.container-subCatigory{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px; 
+
+}
+
+.container-of-subCatigory{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  width: 50%; 
+}
+
+.slach{
+  color: #ff007f;
 }

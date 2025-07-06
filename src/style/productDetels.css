@@ -1,145 +1,1686 @@
-.product-detels-image{
-    width: 70%;
-    height: 500px;
-    object-fit: cover !important;
+/* Color Palette Variables */
+:root {
+    --primary-pink: #ff007f; /* Main button, active states, strong highlights */
+    --light-pink: #FEE7F0; /* Backgrounds, borders, subtle accents */
+    --dark-grey: #333; /* Main text, headings */
+    --medium-grey: #666; /* Secondary text, descriptions */
+    --light-grey: #E5E5E5; /* Light borders, backgrounds */
+    --extra-light-grey: #F8F8F8; /* Page background */
+    --border-color: #E0E0E0;
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-medium: rgba(0, 0, 0, 0.1);
+    --star-filled: #ff007f; /* Pink for filled stars */
+    --star-empty: #C4C4C4; /* Grey for empty stars */
 }
 
-
-@media (max-width: 577px)  {
-.product-detels-image{
-    width: 100%;
-    height: 500px;
-    object-fit: cover ;
-}
-}
-
-/* شاشة كبيرة - ديسكتوب */
-@media (max-width: 993px) {
-.product-detels-image{
-    width: 100%;
-    height: 500px;
-    object-fit: cover ;
-}
-}
-
-
-/* General styling for better font rendering and responsiveness */
+/* Basic Resets & Typography */
 body {
-    font-family: 'Arial', sans-serif; /* Choose a professional font */
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif; /* Prioritize modern web fonts if available */
+    background-color: var(--extra-light-grey);
+    color: var(--dark-grey);
     line-height: 1.6;
-    color: #333;
+    margin: 0;
+    padding: 0;
 }
 
-/* Main Product Image */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--dark-grey);
+}
+
+p {
+    color: var(--medium-grey);
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-pink);
+}
+a:hover {
+    color: var(--dark-grey);
+}
+
+/* --- Utility Classes / Base Styles --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px; /* Default padding for responsiveness */
+}
+
+/* Loading Spinner */
 
 
-/* Thumbnail images */
-.img-thumbnail {
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toastify Custom Styles */
+.toast-success {
+    background-color: #e6ffe6 !important; /* Light green */
+    color: #008000 !important; /* Dark green */
+    border: 1px solid #008000 !important;
+}
+.toast-error {
+    background-color: #ffe6e6 !important; /* Light red */
+    color: #ff0000 !important; /* Dark red */
+    border: 1px solid #ff0000 !important;
+}
+.toast-info {
+    background-color: #e6f7ff !important; /* Light blue */
+    color: #007bff !important; /* Dark blue */
+    border: 1px solid #007bff !important;
+}
+.toast-warning {
+    background-color: #fffbe6 !important; /* Light yellow */
+    color: #ffc107 !important; /* Dark yellow */
+    border: 1px solid #ffc107 !important;
+}
+
+/* --- Page Layout --- */
+.product-detail-page-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 0 15px var(--shadow-light);
+    border-radius: 8px;
+}
+
+/* Breadcrumb */
+.breadcrumb-nav {
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item a {
+    color: var(--medium-grey);
+    font-size: 0.9rem;
+}
+.breadcrumb-item a:hover {
+    color: var(--primary-pink);
+}
+
+.breadcrumb-item.active {
+    color: var(--dark-grey);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* --- Main Product Section --- */
+.product-main-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.product-images-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-product-image-wrapper {
+    width: 100%;
+    max-width: 500px; /* Adjust max width as needed */
+    height: 450px; /* Fixed height for consistent main image area */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.main-product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the entire image is visible */
+    transition: transform 0.3s ease-in-out;
+}
+
+.thumbnail-gallery-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px; /* Match main image wrapper */
+}
+
+.thumbnail-images-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto; /* Enable horizontal scrolling for many thumbnails */
+    padding: 5px 0; /* Add padding for scrollbar */
+    flex-grow: 1; /* Allows it to take available space */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.thumbnail-images-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.thumbnail-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    border: 1px solid #dee2e6; /* Default border */
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevent shrinking in scroll */
 }
 
-.img-thumbnail:hover {
-    transform: translateY(-3px); /* Lift effect on hover */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.thumbnail-image:hover {
+    border-color: var(--primary-pink);
+    transform: translateY(-2px);
 }
 
-.img-thumbnail.border-primary {
-    border-color: #d81b60 !important; /* Bootstrap primary color */
-    border-width: 3px !important;
+.thumbnail-image.active-thumbnail {
+    border: 2px solid var(--primary-pink);
+    box-shadow: 0 0 0 2px var(--light-pink);
 }
 
-/* Buttons */
-.btn-primary, .btn-success {
-    border-radius: 0.5rem; /* Rounded corners for buttons */
-    transition: all 0.3s ease;
+.thumbnail-nav-arrow {
+    background-color: var(--light-grey);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevent shrinking */
+    color: var(--dark-grey);
 }
 
-.btn-primary:hover, .btn-success:hover {
-    transform: translateY(-2px); /* Slight lift on hover */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.thumbnail-nav-arrow:hover {
+    background-color: var(--primary-pink);
+    color: #fff;
+    border-color: var(--primary-pink);
 }
 
-/* Tabs Styling */
-.nav-tabs .nav-link {
-    border: 1px solid #dee2e6;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-bottom: -1px; /* Overlap border with content */
-    background-color: #f8f9fa; /* Light grey background for tabs */
-    color: #495057;
-    transition: all 0.3s ease;
+
+.product-details-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-.nav-tabs .nav-link.active {
+.product-category {
+    font-size: 0.85rem;
+    color: var(--medium-grey);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.product-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.product-rating-summary {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.stars
+.stars-display .filled-star,
+.stars-display-small .filled-star {
+    color: var(--star-filled); /* Pink for filled stars */
+}
+.stars-display .empty-star,
+.stars-display-small .empty-star {
+    color: var(--star-empty); /* Grey for empty stars */
+}
+
+.stars-display i {
+    font-size: 1.1rem;
+    margin-right: 2px;
+}
+.stars-display-small i {
+    font-size: 0.9rem;
+    margin-right: 1px;
+}
+
+/* لتصحيح اتجاه نصف النجمة في RTL */
+.product-detail-page-container[dir="rtl"] .fa-star-half-alt {
+  transform: scaleX(-1); /* يعكس الأيقونة أفقياً */
+  display: inline-block; /* تأكد أن الـ transform بيشتغل صح */
+}
+
+/* يمكنك تعديل المسافات لو تطلب الأمر بعد عكس الأيقونة */
+.product-detail-page-container[dir="rtl"] .fa-star-half-alt.filled-star {
+    /* margin-right: 2px; */ /* مثال: إذا أردت تعديل الهامش بعد العكس */
+}
+
+
+.rating-value {
+    font-weight: 600;
+    color: var(--dark-grey);
+    margin-left: 8px;
+    font-size: 1rem;
+}
+
+.reviews-count {
+    color: var(--medium-grey);
+    font-size: 0.95rem;
+    margin-left: 10px;
+}
+
+.price-info {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.current-price-display {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+}
+
+.old-price-display {
+    text-decoration: line-through;
+    color: var(--medium-grey);
+    font-size: 1.2rem;
+}
+
+.product-short-description {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+.product-additional-info {
+    font-size: 0.95rem;
+    color: var(--medium-grey);
+    margin-bottom: 25px;
+}
+
+.product-meta-details {
+    margin-bottom: 25px;
+    border-top: 1px solid var(--light-grey);
+    padding-top: 20px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.meta-label {
+    font-weight: 600;
+    width: 80px; /* Fixed width for labels */
+    flex-shrink: 0;
+    color: var(--dark-grey);
+}
+.meta-value {
+    color: var(--medium-grey);
+}
+
+.type-options {
+    display: flex;
+    gap: 10px;
+}
+.type-option {
     background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff; /* Active tab has white bottom border */
-    color: #d81b60; /* Primary color for active tab */
-    font-weight: bold;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    color: var(--medium-grey);
+}
+.type-option:hover {
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
+}
+.type-option.active {
+    background-color: var(--primary-pink);
+    color: #fff;
+    border-color: var(--primary-pink);
 }
 
-.tab-content {
+/* Voucher Promo Section */
+.voucher-promo-section {
+    background-color: var(--light-pink);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.voucher-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-pink);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.voucher-subtitle {
+    font-size: 0.9rem;
+    color: var(--medium-grey);
+    margin-bottom: 15px;
+}
+
+.voucher-code-item {
+    display: flex;
+    align-items: center;
     background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-top: none; /* Remove top border as it's handled by tabs */
-    border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners */
-    padding: 1.5rem !important; /* Increase padding */
+    border: 1px dashed var(--primary-pink);
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden; /* For pseudo-elements */
 }
 
-/* Review Section */
+.voucher-code {
+    font-weight: 700;
+    color: var(--dark-grey);
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.voucher-description {
+    font-size: 0.85rem;
+    color: var(--medium-grey);
+    flex-grow: 1;
+}
+
+.copy-voucher-btn {
+    background: none;
+    border: none;
+    color: var(--primary-pink);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s ease;
+}
+.copy-voucher-btn:hover {
+    color: var(--dark-grey);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    background-color: var(--light-pink);
+    border-radius: 20px; /* Pill shape */
+    padding: 5px;
+}
+
+.quantity-btn {
+    background: none;
+    border: none;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--primary-pink);
+    transition: all 0.2s ease;
+    border-radius: 50%; /* Make them round */
+}
+.quantity-btn:hover {
+    background-color: var(--primary-pink);
+    color: #fff;
+}
+
+.quantity-display {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-grey);
+    padding: 0 15px;
+}
+
+.add-to-bag-btn, .buy-now-btn {
+    background-color: var(--primary-pink);
+    color: #fff;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 30px; /* More rounded */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    flex-grow: 1; /* Allow them to grow */
+    max-width: 200px; /* Limit max width */
+}
+
+.add-to-bag-btn:hover, .buy-now-btn:hover {
+    background-color: #B01A51; /* Darker pink */
+    transform: translateY(-2px);
+}
+
+.buy-now-btn {
+    background-color: #4CAF50; /* A green BUY NOW button, as seen in some e-commerce */
+}
+.buy-now-btn:hover {
+    background-color: #45a049;
+}
+
+
+.wishlist-btn {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--medium-grey);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.wishlist-btn:hover {
+    color: var(--primary-pink);
+    border-color: var(--primary-pink);
+    box-shadow: 0 0 8px rgba(209, 32, 97, 0.2);
+}
+
+
+/* --- Description & Reviews Tabs Section --- */
+.product-info-tabs-section {
+    margin-top: 60px;
+}
+
+.product-info-tabs {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0; /* Remove default margin */
+}
+
+.product-info-tabs .nav-item {
+    margin-bottom: -1px; /* Overlap border */
+}
+
+.product-info-tabs .nav-link {
+    border: none;
+    padding: 15px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--medium-grey);
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.product-info-tabs .nav-link:hover {
+    color: var(--primary-pink);
+    border-color: var(--light-pink);
+}
+
+.product-info-tabs .nav-link.active {
+    color: var(--primary-pink);
+    border-color: var(--primary-pink);
+    background-color: #fff;
+    border-radius: 0; /* No rounded corners for tabs as in example */
+}
+
+.product-info-tab-content {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-top: none; /* No top border, connect to tabs */
+    padding: 30px;
+    border-radius: 0 0 8px 8px; /* Only bottom rounded corners */
+}
+
+.tab-content-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--medium-grey);
+}
+
+.ingredients-list .ingredient-item {
+    margin-bottom: 15px;
+}
+.ingredients-list .ingredient-label {
+    font-weight: 600;
+    color: var(--dark-grey);
+    display: block;
+    margin-bottom: 5px;
+}
+.ingredients-list .ingredient-description {
+    font-size: 0.95rem;
+    color: var(--medium-grey);
+}
+
+.report-product-link {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--medium-grey);
+    cursor: pointer;
+}
+.report-product-link:hover {
+    color: var(--primary-pink);
+}
+
+
+/* --- Reviews Section --- */
+.reviews-section-container {
+    display: flex;
+    margin-top: 60px;
+    padding-top: 40px; /* Add some space from previous section */
+    border-top: 1px solid var(--light-grey);
+}
+
+.reviews-summary-column {
+    background-color: #fff; /* White background for summary */
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+    text-align: center; /* Center align content within the summary */
+    flex: 1;
+    max-width: 350px; /* Limit summary column width */
+    margin-left: 30px; /* Space between summary and reviews */
+  
+   
+}
+
+
+.reviews-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.overall-rating {
+    margin-bottom: 25px;
+}
+.overall-rating-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-grey);
+    display: block;
+    margin-bottom: 5px;
+}
+.overall-stars {
+    margin-bottom: 10px;
+}
+.overall-stars i {
+    font-size: 1.5rem;
+}
+.overall-reviews-count {
+    color: var(--medium-grey);
+    font-size: 1rem;
+}
+
+.star-breakdown .star-progress-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.star-label {
+    width: 25px; /* Fixed width for star number */
+    font-weight: 600;
+    color: var(--dark-grey);
+    font-size: 0.95rem;
+}
+.progress-bar-container {
+    flex-grow: 1;
+    height: 8px; /* Thinner progress bar */
+    background-color: var(--light-grey);
+    border-radius: 4px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background-color: var(--primary-pink);
+    border-radius: 4px;
+}
+.star-percentage {
+    width: 30px; /* Fixed width for percentage */
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--medium-grey);
+}
+
+
+
 .review-item {
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--light-grey);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+.review-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
-/* Form Styling */
-.form-control, .form-select {
-    border-radius: 0.3rem;
-    border: 1px solid #ced4da;
-    padding: 0.75rem 1rem; /* Better padding */
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap; /* Allow wrapping */
 }
 
-.form-control:focus, .form-select:focus {
-    border-color: #d81b60;
-    box-shadow: 0 0 0 0.25rem #d81b60;
+.reviewer-name {
+    font-weight: 600;
+    color: var(--dark-grey);
+    margin-right: 15px;
+    font-size: 1rem;
 }
 
-/* Similar Products Card */
-.product-card {
-    border-radius: 0.75rem; /* More rounded corners */
-    overflow: hidden; /* Ensures image corners are rounded */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.review-date {
+    font-size: 0.85rem;
+    color: var(--medium-grey);
+    margin-right: 15px;
 }
 
-.product-card:hover {
-    transform: translateY(-5px); /* Lift effect for cards */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* More prominent shadow on hover */
+.review-stars i {
+    font-size: 0.9rem;
+    color: var(--star-filled);
+    margin-right: 1px;
+}
+
+.review-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--medium-grey);
+    margin-bottom: 10px;
+}
+
+.review-likes {
+    font-size: 0.85rem;
+    color: var(--medium-grey);
+}
+.review-likes i {
+    margin-right: 5px;
+}
+
+.no-reviews-text {
+    text-align: center;
+    padding: 30px;
+    color: var(--medium-grey);
+    font-style: italic;
+}
+
+.view-more-reviews-btn {
+    background-color: var(--primary-pink);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: block; /* Make it a block element to center with margin auto */
+    margin: 30px auto 0 auto;
+}
+.view-more-reviews-btn:hover {
+    background-color: #B01A51;
+    transform: translateY(-2px);
+}
+
+
+/* Add Review Form (within reviews column or separately) */
+.add-review-form-wrapper {
+    background-color: var(--extra-light-grey);
+    padding: 25px;
+    border-radius: 8px;
+    margin-top: 30px;
+    border: 1px solid var(--border-color);
+}
+.add-review-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-pink);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.add-review-form .form-label {
+    font-weight: 500;
+    color: var(--dark-grey);
+    margin-bottom: 8px;
+}
+.add-review-form .form-control,
+.add-review-form .form-select {
+    border-color: var(--border-color);
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+}
+.add-review-form .form-control:focus,
+.add-review-form .form-select:focus {
+    border-color: var(--primary-pink);
+    box-shadow: 0 0 0 0.25rem rgba(209, 32, 97, 0.1);
+}
+
+.add-review-form .submit-review-btn {
+    background-color: var(--primary-pink);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    width: 100%;
+}
+.add-review-form .submit-review-btn:hover:not(:disabled) {
+    background-color: #B01A51;
+    transform: translateY(-2px);
+}
+.add-review-form .submit-review-btn:disabled {
+    background-color: var(--light-pink);
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+
+/* --- Related Products Section --- */
+.related-products-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--light-grey);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive grid */
+    gap: 30px;
+}
+
+.product-card-item {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 15px; /* Padding for text content */
+}
+
+.product-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.product-card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px; /* Fixed height for consistent image size */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
 }
 
 .product-card-image {
-    border-top-left-radius: 0.75rem;
-    border-top-right-radius: 0.75rem;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure image fits */
+    transition: transform 0.3s ease;
 }
 
-/* Toaster styles (optional, can be customized further) */
-.notefection {
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    font-size: 0.95rem !important;
+.product-card-item:hover .product-card-image {
+    transform: scale(1.05); /* Slightly zoom on hover */
 }
 
-/* Responsive adjustments */
-@media (max-width: 767.98px) {
-    .product-main-image {
-        max-height: 400px;
+.add-to-bag-hover {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(209, 32, 97, 0.9); /* Pink overlay */
+    padding: 10px 0;
+    transform: translateY(100%); /* Start off-screen */
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-card-item:hover .add-to-bag-hover {
+    transform: translateY(0); /* Slide up on hover */
+}
+
+.add-to-bag-hover .icon-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.add-to-bag-hover .icon-button:hover {
+    transform: scale(1.1);
+}
+
+.product-card-body {
+    padding: 0 15px;
+}
+
+.product-card-brand {
+    font-size: 0.75rem;
+    color: var(--medium-grey);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.product-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-grey);
+    margin-bottom: 8px;
+    white-space: nowrap; /* Prevent title wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis if too long */
+}
+
+.product-card-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.reviews-count-small {
+    font-size: 0.8rem;
+    color: var(--medium-grey);
+    margin-left: 5px;
+}
+
+.product-card-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.current-price-small {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+}
+.old-price-small {
+    font-size: 0.9rem;
+    text-decoration: line-through;
+    color: var(--medium-grey);
+}
+
+.no-similar-products-text {
+    text-align: center;
+    padding: 30px;
+    color: var(--medium-grey);
+    font-style: italic;
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 991px) {
+    .product-main-section {
+        flex-direction: column;
+        gap: 30px;
     }
-    .d-flex.flex-wrap.justify-content-md-start {
-        justify-content: center !important; /* Center thumbnails on small screens */
+    .product-details-column {
+        padding-left: 0; /* Remove padding from desktop */
     }
-    .btn-lg {
+
+    .reviews-summary-column {
+        border-right: none;
+        border-bottom: 1px solid var(--light-grey);
+        padding-right: 0;
+        padding-bottom: 30px;
+        max-width: 100%;
+        
+    }
+    .individual-reviews-column {
+        padding-top: 20px;
+    }
+    .add-review-form-wrapper {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .product-detail-page-container {
+        padding: 20px;
+    }
+    .product-title {
+        font-size: 1.8rem;
+    }
+    .current-price-display {
+        font-size: 1.6rem;
+    }
+    .old-price-display {
         font-size: 1rem;
-        padding: 0.75rem 1rem;
+    }
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .add-to-bag-btn, .buy-now-btn {
+        width: 100%;
+        max-width: none;
+        padding: 12px 20px;
+    }
+    .wishlist-btn {
+        width: 45px;
+        height: 45px;
+    }
+    .quantity-control {
+        width: 100%;
+        justify-content: center;
+    }
+    .product-info-tabs .nav-link {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    .reviews-title, .section-title {
+        font-size: 1.5rem;
+    }
+    .related-products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    .product-card-image-wrapper {
+        height: 160px;
     }
 }
+
+@media (max-width: 575px) {
+    .product-main-section {
+        gap: 20px;
+    }
+    .main-product-image-wrapper {
+        height: 300px;
+    }
+    .thumbnail-image {
+        width: 60px;
+        height: 60px;
+    }
+    .product-title {
+        font-size: 1.5rem;
+    }
+    .current-price-display {
+        font-size: 1.4rem;
+    }
+    .old-price-display {
+        font-size: 0.9rem;
+    }
+    .voucher-promo-section {
+        padding: 15px;
+    }
+    .product-info-tab-content {
+        padding: 20px;
+    }
+    .related-products-grid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
+    .reviews-summary-column {
+        padding-bottom: 20px;
+    }
+  
+    .reviewer-name, .review-date {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+}
+
+/* In your CSS file or a style block */
+
+.action-buttons {
+  display: flex; /* Makes the items line up horizontally */
+  align-items: center; /* Vertically centers items */
+  gap: 10px; /* Adds space between the items */
+  flex-wrap: wrap; /* Allows items to wrap to the next line on smaller screens */
+}
+
+.wishlist-button-container {
+  /* Style the container for the heart icon to make it look like a button */
+  border: 1px solid #dc3545; /* Red border */
+  border-radius: 8px; /* Slightly rounded corners */
+  padding: 8px 12px; /* Add some padding */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  background-color: #f8d7da; /* Light red background */
+}
+
+
+.wishlist-icon {
+  /* Ensure the icon itself is styled correctly */
+  font-size: 1.5rem; /* Adjust icon size as needed */
+  /* Remove any conflicting background or text-color from previous styles if they are external */
+}
+
+/* Specific styles for the heart icons when active/inactive */
+.wishlist-button-container .fa-heart { /* Filled heart */
+  color: #dc3545; /* Red color */
+}
+
+.wishlist-button-container:hover .fa-heart { /* Filled heart on hover */
+  color: white; /* White color on hover */
+}
+
+
+.wishlist-button-container .fa-reg-heart { /* Outline heart */
+  color: #dc3545; /* Red color */
+}
+
+.wishlist-button-container:hover .fa-reg-heart { /* Outline heart on hover */
+  color: white; /* White color on hover */
+}
+
+
+/* Adjust the 'Add to Bag' button if needed to align well */
+.add-to-bag-btn {
+  /* You might want to ensure its height and padding are consistent */
+  padding: 10px 15px; /* Example padding */
+  font-size: 1rem;
+}
+
+/* Ensure the quantity control also looks good */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden; /* Important for border-radius on buttons */
+}
+
+.quantity-btn {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quantity-display {
+  padding: 0 10px;
+  min-width: 30px; /* Ensures consistent width */
+  text-align: center;
+}
+
+/* مثال في ملف CSS: ProductReviews.css */
+
+.reviews-section-container {
+  display: flex;
+  flex-wrap: wrap; /* عشان لو الشاشة صغيرة، ينزلوا تحت بعض */
+ 
+  padding: 20px;
+  background-color: #f8f8f8; /* لون خلفية فاتح للقسم كله لو حابب */
+  border-radius: 8px;
+}
+
+
+
+
+.review-item {
+  /* ده الكلاس اللي هندي له الخلفية الرصاصي الفاتح */
+  background-color: #f7f7f7; /* لون رصاصي فاتح جداً */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* ظل خفيف يدي عمق */
+  border: 1px solid #eee; /* حدود خفيفة جداً */
+}
+
+.reviews-title {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: right; /* لو الموقع عربي */
+}
+
+.overall-rating {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.overall-rating-value {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+.stars,
+.overall-stars {
+  color: #ffc107; /* لون النجوم ذهبي */
+  margin: 10px 0;
+}
+
+.overall-reviews-count {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.star-breakdown {
+  margin-top: 30px;
+}
+
+.star-progress-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.star-label {
+  font-weight: bold;
+  color: #555;
+  width: 20px; /* عشان يبقى كلهم محاذاة */
+  text-align: right;
+}
+
+.progress-bar-container {
+  flex-grow: 1; /* ياخد باقي المساحة */
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color:#ffc107; /* لون أخضر للتقدم */
+  border-radius: 5px;
+  transition: width 0.5s ease-in-out;
+}
+
+.star-percentage {
+  font-size: 0.9em;
+  color: #666;
+  width: 40px; /* عشان يبقى كلهم محاذاة */
+  text-align: left;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.reviewer-name {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.review-date {
+  font-size: 0.85em;
+  color: #777;
+}
+
+.review-stars {
+  color: #ffc107; /* لون النجوم في المراجعات الفردية */
+  margin-right: auto; /* عشان تزق اسم المراجع والتاريخ على الشمال */
+}
+
+.review-text {
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.review-likes {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.no-reviews-text {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-style: italic;
+}
+
+.view-more-reviews-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  align-self: center; /* عشان الزرار يتسنتر في عمود المراجعات */
+}
+
+.view-more-reviews-btn:hover {
+  background-color: #0056b3;
+}
+
+/* تعديلات لو عايز الصفحة كلها RTL */
+body {
+    direction: rtl;
+    text-align: right;
+}
+/* ممكن تحتاج تعديل الـ margin-left و margin-right للأيقونات والنصوص عشان تظبط الاتجاه */
+.review-header .review-stars {
+    margin-right: 0; /* إلغاء الـ push to left */
+    margin-left: auto; /* زق النجوم لليمين */
+}
+
+
+.related-product-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  cursor: pointer;
+}
+
+.related-product-card:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.product-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.related-product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* إزالة CSS الخاص بزر الإضافة للسلة */
+
+
+
+
+
+
+/* تنسيقات عامة للبطاقة */
+.related-product-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.product-image {
+  width: 100%;
+  height: 200px; /* ارتفاع ثابت للصور */
+  object-fit: cover; /* تغطية المساحة دون تشويه */
+  transition: all 0.5s ease;
+  display: block;
+}
+
+/* تنسيق أيقونة العين */
+.view-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 40px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+/* تأثيرات الـ Hover */
+.related-product-card:hover .product-image {
+  transform: scale(1.05);
+  filter: brightness(0.7); /* تخفيف إضاءة الصورة */
+}
+
+.related-product-card:hover .view-icon {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* طبقة شفافة عند الـ Hover */
+.related-product-card:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  border-radius: 8px;
+}
+
+/* تنسيقات النص والمعلومات */
+.product-info {
+  padding: 12px 0;
+}
+
+.price-section {
+  margin: 8px 0;
+}
+
+.discounted-price {
+  color: #e63946;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* تنسيقات التنقل */
+.swiper-button-prev, 
+.swiper-button-next {
+  color: #333;
+  background: rgba(255, 255, 255, 0.9);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.swiper-button-prev::after, 
+.swiper-button-next::after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* تنسيق النقاط */
+.swiper-pagination {
+  position: relative;
+  margin-top: 20px;
+}
+
+.swiper-pagination-bullet {
+  background: #ccc;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #333;
+}
+
+/* General improvements for the product detail page container */
+.product-detail-page-container {
+    padding: 15px; /* Add some padding around the entire page */
+    font-family: 'Arial', sans-serif; /* Example font, adjust as needed */
+    color: #333;
+}
+
+/* --- Reviews Section Styling --- */
+
+.reviews-section-container {
+    display: flex; /* Use flexbox for the main reviews section */
+   
+    gap: 30px; /* Space between the summary and individual reviews */
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background for the section */
+    border-radius: 8px;
+    margin-top: 40px; /* Space above the reviews section */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Subtle shadow */
+}
+
+/* Reviews Summary Column */
+
+
+.reviews-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.overall-rating {
+    margin-bottom: 20px;
+}
+
+.overall-rating-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: #555;
+    display: block; /* Make it a block element to take full width */
+    margin-bottom: 10px;
+}
+
+.overall-stars .filled-star {
+    color: #ffc107; /* Gold color for filled stars */
+    font-size: 28px;
+    margin: 0 2px;
+}
+
+.overall-stars .empty-star {
+    color: #e0e0e0; /* Lighter color for empty stars */
+    font-size: 28px;
+    margin: 0 2px;
+}
+
+.overall-reviews-count {
+    font-size: 18px;
+    color: #777;
+    margin-top: 10px;
+    display: block;
+}
+
+/* Star breakdown progress bars */
+.star-breakdown {
+    width: 90%; /* Adjust width for smaller screens */
+    max-width: 350px; /* Max width for consistency */
+    margin: 0 auto; /* Center the breakdown */
+}
+
+.star-progress-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.star-label {
+    flex-shrink: 0; /* Prevent label from shrinking */
+    width: 20px; /* Fixed width for star label */
+    text-align: right;
+    margin-right: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.progress-bar-container {
+    flex-grow: 1; /* Allows progress bar to take available space */
+    background-color: #e9ecef;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden; /* Ensures fill stays within bounds */
+    margin: 0 10px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #ffc107; /* Gold fill color */
+    border-radius: 5px;
+    transition: width 0.5s ease-in-out; /* Smooth transition for percentage changes */
+}
+
+.star-percentage {
+    flex-shrink: 0;
+    width: 35px; /* Fixed width for percentage */
+    text-align: left;
+    color: #555;
+    font-weight: bold;
+}
+
+/* Individual Reviews Column */
+.individual-reviews-column {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+}
+
+.no-reviews-text {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 20px 0;
+}
+
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    background-color: #fff; /* Ensure white background, remove bg-info class from JSX */
+    padding: 15px; /* Add padding to each review item */
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow for individual reviews */
+}
+
+.review-item:last-child {
+    border-bottom: none; /* No border for the last review */
+    margin-bottom: 0;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.reviewer-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-left: 10px; /* Space between name and date */
+}
+
+.review-date {
+    font-size: 14px;
+    color: #888;
+    flex-grow: 1; /* Allow date to take up space */
+    text-align: right; /* Align date to the right for RTL */
+}
+
+.review-stars .fas,
+.review-stars .far {
+    color: #ffc107; /* Gold color for stars in reviews */
+    font-size: 16px;
+    margin-left: 2px; /* Space between stars */
+}
+
+.review-text {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.review-likes {
+    font-size: 14px;
+    color: #777;
+    display: flex;
+    align-items: center;
+}
+
+.review-likes i {
+    color: #007bff; /* Example color for like icon */
+}
+
+.view-more-reviews-btn {
+    display: block; /* Make button full width */
+    width: fit-content; /* Adjust width based on content */
+    margin: 20px auto 0 auto; /* Center button horizontally */
+    background-color: #007bff; /* Example button color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.view-more-reviews-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Media query for larger screens (e.g., tablets and desktops) */
+@media (min-width: 768px) {
+    .reviews-section-container {
+        flex-direction: row; /* Arrange columns side-by-side on larger screens */
+        align-items: flex-start; /* Align items to the top */
+    }
+
+    .reviews-summary-column {
+        max-width: 350px; /* Limit summary column width */
+        margin-left: 30px; /* Space between summary and reviews */
+        position: sticky; /* Make it sticky */
+        top: 20px; /* Stick to the top with some offset */
+    }
+
+    .individual-reviews-column {
+        flex: 2; /* Take more space for reviews */
+    }
+
+    .star-breakdown {
+        width: 100%; /* Full width within its column on larger screens */
+        max-width: none;
+    }
+
+    .overall-rating-value {
+        font-size: 60px; /* Larger font for desktop */
+    }
+}
+
+/* Remove the temporary bg-info from JSX: */
+/* In your ProductDetail.jsx file, change this line: */
+/* <div key={review._id} className="review-item bg-info"> */
+/* To this: */
+/* <div key={review._id} className="review-item"> */

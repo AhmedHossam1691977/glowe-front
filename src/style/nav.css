@@ -1,0 +1,397 @@
+#nav .container {
+  padding: 20px;
+}
+
+.navbar {
+  background-color: #fff;
+  border-bottom: 1px solid #f8bbd0;
+  padding: 10px 20px;
+}
+
+
+.navbar-brand {
+  font-weight: bold;
+  color: #ff007f;
+}
+
+.nav-link {
+  color: #333;
+  margin-right: 15px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #ff007f !important;
+}
+.nav-conection-detel{
+  background-color: #ff007f;
+}
+
+.cart-count{
+  font-size: 12px;
+}
+
+
+.nav-link.active-link {
+    font-weight: bold;
+    border-bottom: 2px solid #ff007f !important; /* خط تحت الرابط النشط */
+   
+}
+
+.nav-conection-detel .active-link {
+    font-weight: bold;
+    text-decoration: underline !important;
+}
+
+.fixed-bottom .active-mobile-bottom-nav {
+
+    color: #ff007f !important; /* لون نشط في الشريط السفلي */
+    font-weight: bold;
+    transition: all .4s;
+}
+
+.btn-outline-secondary-serch{
+  border-radius: 0% 30% 30% 0% !important;
+  padding: 5px 0.75rem !important;
+}
+
+.form-control{
+  padding: 5px 10px !important;
+}
+
+
+.custom-mobile-navbar {
+    min-height: auto; /* Override Bootstrap's default min-height */
+    padding-top: 0;   /* Remove default padding */
+    padding-bottom: 0;/* Remove default padding */
+    /* يمكنك تحديد ارتفاع ثابت هنا إذا أردت، ولكن يفضل تركه يتكيف */
+    /* height: 50px; */
+}
+
+
+.custom-search-input {
+    height: 35px; /* تحديد ارتفاع حقل البحث بشكل صريح */
+    min-height: 35px; /* تأكيد الحد الأدنى للارتفاع */
+    font-size: 0.9rem; /* تصغير حجم الخط داخل حقل البحث قليلًا */
+}
+
+.custom-search-btn {
+    height: 35px; /* تأكد أن زر البحث بنفس ارتفاع حقل البحث */
+    min-height: 35px;
+    padding: 0.375rem 0.75rem; /* تعديل الـ padding إذا لزم الأمر */
+    font-size: 0.9rem; /* تصغير حجم الخط في الزر إذا لزم الأمر */
+}
+
+
+.navbar-brand {
+ color: #ff007f !important;
+    font-size: 1.1rem; /* تصغير حجم الشعار قليلًا إذا أردت */
+}
+
+.btn-close {
+    background-color: white !important;
+    border: none !important;
+}
+
+.offcanvas {
+    z-index: 1060 !important; 
+    transition: all .5s;
+}
+
+.navbar.fixed-bottom {
+    z-index: 1040 !important; /* أقل من الـ offcanvas */
+}
+
+.mobile-categories-list {
+    background-color: #f8f8f8;
+}
+
+
+.mobile-categories-list .nav-item button {
+    text-align: right;
+    padding: 12px 15px;
+    border-radius: 0;
+    color: #333;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-bottom: 1px solid #df0505;
+}
+
+
+
+.mobile-categories-list .nav-item button.active-mobile-category {
+    background-color: #fff;
+    color: #ff007f;
+    border-right: 4px solid #ff007f;
+    font-weight: bold;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+}
+
+.mobile-subcategories-grid .col span {
+    font-size: 0.75rem;
+    color: #ff007f;
+}
+
+.mobile-subcategories-grid .col a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: 5px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.offcanvas{
+  width: 86% !important; /* تأكد من أن الـ offcanvas يأخذ العرض الكامل */
+}
+
+.nav-conection-detel {
+    background-color: #ff007f;
+}
+
+.input-group > .form-control {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group > .btn-outline-secondary {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+
+.btn-outline-secondary:hover {
+    color: #000;
+    background-color: #f8f9fa;
+    border-color: #ccc;
+}
+
+
+.active-link-desktop-user-actions {
+    color: #ff007f !important;
+}
+
+.nav-link.active-link {
+    color:#ff007f !important;
+    border-bottom: 2px solid #ff007f;
+    padding-bottom: 5px;
+}
+
+.dropdown-menu {
+    text-align: right;
+}
+
+.dropdown-item {
+    text-align: right;
+}
+
+.category-dropdown-container {
+    position: relative;
+}
+
+.full-width-dropdown {   
+  position: fixed; 
+    top: 150px; 
+    left: 0;
+    right: 0;
+    width: 100%; 
+    background-color: #fff;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 1.5rem 0;
+    border-top: 1px solid #eee;
+    box-sizing: border-box; 
+}
+
+.nav-item .dropdown-toggle.active-link {
+    color: #ff007f;
+    background-color: #f0f0f0;
+}
+
+.nav-item .dropdown-toggle:hover {
+    color: #ff007f;
+    background-color: #f8f9fa;
+}
+
+.dropdown-close-btn {
+    margin-top: 1rem;
+}
+
+.custom-mobile-navbar {
+    z-index: 1030;
+}
+
+.offcanvas.offcanvas-end {
+    width: 80%;
+}
+
+.active-mobile-bottom-nav {
+    color: var(--primary-color) !important;
+}
+
+.small-text-login {
+    font-size: 0.75rem;
+}
+
+/* In your nav.css */
+
+/* For desktop full-width category dropdown */
+.category-dropdown-container {
+    position: static; /* Allows the dropdown-menu to break out of the nav-item's overflow */
+}
+
+.category-dropdown-container .dropdown-menu {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0; /* Override Bootstrap's default margin-top if present */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Optional: add shadow */
+    padding: 1rem 0; /* Add some padding */
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Adjustments for subcategory image containers */
+.subcategory-image-container {
+    width: 80px; /* Example size */
+    height: 80px; /* Example size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0 auto; /* Center the container */
+}
+
+.subcategory-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.subcategory-item:hover .subcategory-image-container {
+    border-color: #ff007f; /* Example hover effect */
+}
+.subcategory-item:hover span {
+    color: #ff007f; /* Example hover effect for text */
+}
+
+/* ... (Existing CSS rules) */
+
+/* Full-width dropdown for desktop categories */
+.navbar .dropdown-menu.full-width-dropdown {
+    width: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0; /* Remove any default top margin */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    padding: 20px 15px; /* Add some padding inside the dropdown */
+    display: block; /* Ensure it's treated as a block for layout */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    position: absolute; /* Essential for full width */
+}
+
+.navbar .dropdown-menu.full-width-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Ensure subcategory image container has a defined size */
+.subcategory-image-container {
+    width: 80px; /* Adjust as needed */
+    height: 80px; /* Adjust as needed */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px; /* Space between image and text */
+}
+
+
+
+/* Style for the main category image within the dropdown */
+.catigory-image-container {
+    height: 100%; /* Make it fill the available height */
+    width: 100%;
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding-left: 15px; /* Add some padding to separate from subcategories */
+    border-right: 1px solid #eee; /* Optional: add a separator line */
+}
+
+.catigory-image-container img {
+    max-width: 100%;
+    max-height: 100%; /* Adjust as needed, or use a fixed height */
+    object-fit: contain; /* Ensures the whole image is visible */
+    border-radius: 8px; /* Optional: rounded corners for the image */
+    border-radius: 50% !important; /* Make the image circular */
+}
+
+
+#nav img{
+    max-width: 100%;
+    height: auto; /* Ensure images scale properly */
+    border-radius: 5px 100px 5px 100px !important; /* Make all images circular */
+}
+
+/* Adjust column spacing for the dropdown content */
+.dropdown-menu .row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.dropdown-menu .col-6,
+.dropdown-menu .col-md-4,
+.dropdown-menu .col-lg-3,
+.dropdown-menu .col-lg-9,
+.dropdown-menu .col-md-8 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Ensure the main dropdown is positioned correctly relative to the nav item */
+.nav-item.dropdown.category-dropdown-container {
+    position: static; /* Important for full-width dropdown to align with viewport */
+}
+
+/* Optional: Refine spacing for subcategory items */
+.subcategory-item {
+    padding: 5px; /* Add some padding around each subcategory item */
+    transition: transform 0.2s ease;
+}
+
+.subcategory-item:hover {
+    transform: translateY(-3px); /* Slight lift on hover */
+}
+
+/* Responsive adjustments for the desktop dropdown */
+@media (max-width: 991.98px) { /* For medium devices and below, if this dropdown still shows */
+    .dropdown-menu.full-width-dropdown .col-lg-9,
+    .dropdown-menu.full-width-dropdown .col-lg-3 {
+        width: 100%; /* Make columns full width on smaller screens if needed */
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .catigory-image-container {
+        border-right: none; /* Remove separator on smaller screens */
+        padding-left: 0;
+        margin-top: 20px; /* Add space above the image */
+    }
+}

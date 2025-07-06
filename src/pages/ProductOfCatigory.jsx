@@ -15,7 +15,7 @@ import 'swiper/css/navigation';
 import axios from "axios";
 import { productContext } from "../context/Product.Contextt.jsx";
 
-export default function ProductOfSubCarigory() {
+export default function ProductOfCatigory() {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -25,6 +25,7 @@ export default function ProductOfSubCarigory() {
   const [activeSort, setActiveSort] = useState("title");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [subCatigoryOfCatigory, setSubCatigoryOfCatigory] = useState("");
   
   const baseUrl = "https://final-pro-api-j1v7.onrender.com";
   const { product: searchTerm } = useContext(productContext);
@@ -45,12 +46,13 @@ export default function ProductOfSubCarigory() {
 
   async function getSubCatigory() {
     try {
-      let { data } = await axios.get(`${baseUrl}/api/v1/subCategory/${id}`).catch((err) => {
+      let { data } = await axios.get(`${baseUrl}/api/v1/categories/${id}`).catch((err) => {
         console.log(err);
       });
-      console.log(data);
-      setProducts(data.allProduct);
-      setFilteredProducts(data.allProduct);
+      setSubCatigoryOfCatigory(data.category.allSubCatigory);
+      console.log(data.category.allSubCatigory);
+      setProducts(data.category.allProduct);
+      setFilteredProducts(data.category.allProduct);
       
       const initialActiveSlides = {};
       data.allProduct.forEach(p => {
@@ -257,7 +259,29 @@ export default function ProductOfSubCarigory() {
     
 
         <div className="col-md-12 ">
-          <div className="sort-section mb-4">
+          <div className="sort-section mb-4 ">
+           <div>
+    <h2 className="text-center mb-3">الاقسام الفرعية</h2>
+    {subCatigoryOfCatigory && subCatigoryOfCatigory.length > 0 ? (
+        <div className="d-flex flex-wrap gap-2 justify-content-center container-subCatigory">
+           <div className="d-flex flex-wrap gap-2 justify-content-center  container-of-subCatigory">
+             {subCatigoryOfCatigory.map((subCat) => (
+                <Link
+                    key={subCat._id}
+                    to={`/productOfSubCarigory/${subCat._id}`}
+                    className="fs-4 fw-bold text-decoration-none subCatigory-Of-Catigory"
+                >
+                    {subCat.name} <spam className="slach">/</spam>
+                </Link>
+            ))}
+           </div>
+        </div>
+    ) : (
+        <div className="alert alert-info text-center">
+            لا توجد أقسام فرعية متاحة حاليًا
+        </div>
+    )}
+</div>
             <span className="fs-5 me-2 fw-bold">ترتيب حسب</span>
             <div className="d-flex flex-wrap align-items-center  sort-options">
               {sortOptions.map(({ label, value }) => (

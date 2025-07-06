@@ -23,12 +23,19 @@ import SubCatigoryContextProvider from "./context/SubcatigoruContext.jsx";
 import NavBar from "./components/NavBar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRouter from "./components/ProtectedData.jsx";
-import Loader from "../src/components/Loader.jsx"; // ✅ اللودر الجديد
+import Loader from "../src/components/Loader.jsx";
 
 // صفحات عادية
 import WhichList from "./pages/WhichList.jsx";
 import ProductDetel from "./pages/ProductDetel.jsx";
 import ProductOfSubCarigory from "./pages/ProductOfSubCarigory.jsx";
+import ForgetPassword from "./pages/ForgetPassword.jsx";
+import VerefyCode from "./pages/VerefyCode.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import ProductOffer from "./pages/ProductOffer.jsx";
+import CreatCashOrder from "./pages/CreatCashOrder.jsx";
+import CatigoryContextProvider from "./context/CarigruContext.jsx";
+import ProductOfCatigory from "./pages/ProductOfCatigory.jsx";
 
 // Lazy-loaded صفحات
 const Home = lazy(() => import("./pages/Home.jsx"));
@@ -36,7 +43,6 @@ const Products = lazy(() => import("./pages/Products.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const SignUp = lazy(() => import("./pages/SignUp.jsx"));
 const ResetEmail = lazy(() => import("./pages/ResetEmail.jsx"));
-const MapBoxing = lazy(() => import("./pages/MapBoxing.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 const Cart = lazy(() => import("./pages/Cart.jsx"));
 
@@ -63,12 +69,20 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
+  // ✨ تعريف المسارات التي لا يجب أن يظهر فيها الـ Navbar والـ Footer
+  const noHeaderFooterPaths = ['/login', '/signUp', '/resetEmail'  ,'/forgetpass' ,'/verefyCode','/resetPassword'];
+
+  // ✨ التحقق مما إذا كان المسار الحالي ضمن القائمة
+  const shouldShowHeaderAndFooter = !noHeaderFooterPaths.includes(location.pathname);
+
   return (
     <div className="app" dir="rtl">
       <Toaster position="top-center" />
-      <NavBar userdata={userdata} />
 
-      <main className="main-content container">
+      {/* ✨ عرض NavBar بشكل شرطي */}
+      {shouldShowHeaderAndFooter && <NavBar userdata={userdata} />}
+
+      <main className="main-content container-fluide">
         {loadingPage ? (
           <Loader />
         ) : (
@@ -81,6 +95,23 @@ function AppContent() {
               <Route path="/blog" element={<div>Blog</div>} />
               <Route path="/faq" element={<div>FAQ</div>} />
 
+              {/* هذه الروابط يجب أن تكون هنا داخل <Routes> */}
+              <Route path="/login" element={<Login savedata={savedata} />} />
+              <Route path="/signUp" element={<SignUp />} />
+              <Route path="/resetEmail" element={<ResetEmail savedata={savedata} />} />
+              <Route path="/forgetpass" element={<ForgetPassword/>} />
+              <Route path="/verefyCode" element={<VerefyCode/>} />
+              <Route path="/resetPassword" element={<ResetPassword/>} />
+
+
+              <Route
+                path="/productOffer"
+                element={
+                    <ProductOffer />
+                }
+              />
+
+
               <Route
                 path="/cart"
                 element={
@@ -89,11 +120,12 @@ function AppContent() {
                   </ProtectedRouter>
                 }
               />
-              <Route
-                path="/mapBox"
+           
+           <Route
+                path="/checkout/:id"
                 element={
                   <ProtectedRouter>
-                    <MapBoxing />
+                    <CreatCashOrder />
                   </ProtectedRouter>
                 }
               />
@@ -113,6 +145,14 @@ function AppContent() {
                   </ProtectedRouter>
                 }
               />
+                 <Route
+                path="/productOfCatigory/:id"
+                element={
+                  <ProtectedRouter>
+                    <ProductOfCatigory />
+                  </ProtectedRouter>
+                }
+              />
               <Route
                 path="/productOfSubCarigory/:id"
                 element={
@@ -122,22 +162,21 @@ function AppContent() {
                 }
               />
 
-              <Route path="/login" element={<Login savedata={savedata} />} />
-              <Route path="/signUp" element={<SignUp />} />
-              <Route path="/resetEmail" element={<ResetEmail savedata={savedata} />} />
               <Route path="/*" element={<NotFound />} />
             </Routes>
           </Suspense>
         )}
       </main>
 
-      <Footer />
+      {/* ✨ عرض Footer بشكل شرطي */}
+      {shouldShowHeaderAndFooter && <Footer />}
     </div>
   );
 }
 
 export default function App() {
   return (
+    <CatigoryContextProvider>
     <SubCatigoryContextProvider>
       <ProductContextProvider>
         <CartContextProvider>
@@ -149,5 +188,6 @@ export default function App() {
         </CartContextProvider>
       </ProductContextProvider>
     </SubCatigoryContextProvider>
+    </CatigoryContextProvider>
   );
 }

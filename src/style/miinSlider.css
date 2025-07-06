@@ -1,74 +1,163 @@
-.slider-image {
+/* General slider container adjustments */
+.swiper {
   width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 10px;
+  height: 100%;
 }
 
+/* Image Container - Default (PC First - full height) */
+/* هذا سيطبق على الكمبيوتر بشكل افتراضي */
 .slider-image-container {
+  padding-bottom: 40%; 
+  height: 100%; /* الارتفاع الافتراضي 100% (للـ PC) */
   position: relative;
+  /* أزلنا rounded-corners من هنا لأنه يتم التحكم بها في الـ JSX */
 }
 
+/* Image Styling */
+.slider-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Text Overlay */
 .slider-text-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white; /* خلي النص أبيض */
-  font-weight: bold;
-  font-size: 1.5rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* ظل للنص عشان يبان فوق الصورة */
-  pointer-events: none; /* عشان النص ما يأثرش على التفاعل مع الصورة */
-  white-space: nowrap;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* النص فوق الصورة سيأخذ نفس ارتفاع الصورة */
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 15px;
 }
 
+.slider-text-overlay .slider-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #f8f9fa;
+}
+
+/* Button Styling */
+.slider-text-overlay .slider-button {
+  background-color: #ff007f;
+  border-color: #ff007f;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.3rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.slider-text-overlay .slider-button:hover {
+  background-color: #ff007f;
+  border-color: #ff007f;
+  color: #fff;
+}
+
+/* Swiper Pagination (dots) */
 .swiper-pagination-bullet {
-  background-color: #f8bbd0; 
+  background: #6c757d;
   opacity: 0.7;
 }
 
 .swiper-pagination-bullet-active {
-  background-color: #d81b60;
+  background: #ff007f;
   opacity: 1;
 }
 
+/* --- Responsive Adjustments --- */
 
-.slider-text-overlay {
-  position: absolute;
-  top: 50%;
-  right: 20px;        /* خلي الكلام ناحية اليمين بمسافة 20 بكسل */
-  transform: translateY(-50%);  /* نحركه في النص عموديًا بس بدون تحريك أفقي */
-  color: #ffffff; /* لون بناتي */
-  font-size: 4rem;
-  font-weight: 700;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-shadow: 2px 2px 6px #d81b60;
-  text-align: right;  /* الكلام يتظبط ناحية اليمين */
-  padding: 0 10px;
-  user-select: none;
-  white-space: normal; /* يسمح بتقسيم الكلام لسطرين */
-  line-height: 1.3;
-  max-width: 60%; /* عشان الكلام ما يطلعش برا */
-}
-
-@media (max-width: 577px)  {
-  .slider-text-overlay {
-    font-size: 1.5rem ;
-    max-width: 70%;
-    right: 15px;
-    margin-top: 10px;
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .slider-image-container {
+    height: 100%; /* للتابلت والكمبيوتر */
+  }
+  .slider-text-overlay .slider-text {
+    font-size: 2.2rem;
   }
 }
 
-/* شاشة كبيرة - ديسكتوب */
-@media (max-width: 993px) {
-  .slider-text-overlay {
-    font-size: 2rem;
-    max-width: 60%;
-    right: 20px;
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .slider-image-container {
+    /* padding-bottom: 25%; */
+    height: 100%; /* للديسكتوب */
+  }
+  .slider-text-overlay .slider-text {
+    font-size: 2.8rem;
   }
 }
 
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .slider-image-container {
+    /* padding-bottom: 20%; */
+    height: 100%; /* للشاشات الكبيرة جداً */
+  }
+}
 
+/* --- Mobile specific adjustments (Phone sizes: less than 768px) --- */
+@media (max-width: 767.98px) {
+  .slider-image-container {
+    height: 25vh; 
+    padding-bottom: 0; /* نلغي الـ padding-bottom هنا لأن الـ height هو اللي بيتحكم */
+  }
 
+  .slider-image-container img {
+    height: 100% !important; /* تأكد أن الصورة تملأ الـ 50vh المحدد */
+  }
 
+  .slider-text-overlay {
+    height: 100%; /* النص فوق الصورة سيأخذ نفس ارتفاع الصورة (50vh) */
+  }
+
+  .slider-text-overlay .slider-text {
+    font-size: 1.2rem;
+    padding: 0 10px;
+  }
+  .slider-text-overlay .slider-button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Swiper Pagination (dots) */
+#minSlider .swiper-pagination {
+  position: relative;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  transform: none;
+  width: 100%;
+  top: auto !important;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+#minSlider .swiper-pagination-bullet {
+  background: #6c757d;
+  opacity: 0.7;
+}
+
+#minSlider .swiper-pagination-bullet-active {
+  background: #ff007f;
+  opacity: 1;
+}
+
+/* مهم جداً: نضيف مسافة سفلية (padding-bottom) للـ Swiper نفسه */
+/* عشان النقط متبقاش متداخلة مع أي محتوى تحت السلايدر */
+#minSlider .swiper {
+  padding-bottom: 40px;
+}
