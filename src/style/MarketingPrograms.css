@@ -1,0 +1,42 @@
+.marketing-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 30px 20px;
+  direction: rtl;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  color: #333;
+  line-height: 1.8;
+  text-align: right;
+}
+
+.marketing-container h2 {
+  font-size: 26px;
+  color: #d9008d;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.marketing-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.marketing-list li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.coming-soon-box {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-weight: bold;
+  border: 1px solid #ffeeba;
+}

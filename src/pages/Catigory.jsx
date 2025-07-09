@@ -27,7 +27,7 @@ export default function Catigory() {
 
     return (
         <div className="container py-5"> {/* Added py-5 for vertical padding */}
-            <h2 className="text-center mb-5">منتجاتنا</h2>
+            <h2 className="text-center mb-5">الاقسام</h2>
             <div className="row justify-content-center">
                 {allCatigory && allCatigory.length > 0 ? ( // Ensure allCatigory is not null/undefined and has items
                     allCatigory.map((catigory) => (

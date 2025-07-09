@@ -1,0 +1,6 @@
+.discount-badge-custom {
+  font-size: 0.75rem;
+  z-index: 5;
+  border-bottom-left-radius: 6px;
+  border-top-right-radius: 0.375rem;
+}

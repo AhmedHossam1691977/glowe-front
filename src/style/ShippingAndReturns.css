@@ -1,0 +1,43 @@
+.shipping-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 30px 20px;
+  direction: rtl;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  line-height: 1.8;
+  color: #333;
+}
+
+.shipping-container h2 {
+  font-size: 26px;
+  color: #d9008d;
+  margin-bottom: 25px;
+  text-align: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.shipping-section {
+  margin-bottom: 30px;
+}
+
+.shipping-section h3 {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 6px;
+}
+
+.shipping-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.shipping-section ul li {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #444;
+}

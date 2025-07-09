@@ -36,6 +36,19 @@ import ProductOffer from "./pages/ProductOffer.jsx";
 import CreatCashOrder from "./pages/CreatCashOrder.jsx";
 import CatigoryContextProvider from "./context/CarigruContext.jsx";
 import ProductOfCatigory from "./pages/ProductOfCatigory.jsx";
+import UserOrder from "./pages/UserOrder.jsx";
+import ImformationOrders from "./pages/ImformationOrders.jsx";
+import Blog from "./pages/Blog.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
+import SiteMap from "./pages/SiteMap.jsx";
+import ShippingAndReturns from "./pages/ShippingAndReturns.jsx";
+import SafeShopping from "./pages/SafeShopping.jsx";
+import MarketingPrograms from "./pages/MarketingPrograms.jsx";
+import TermsOfUse from "./pages/Terms.jsx";
+import PaymentMethods from "./pages/PaymentMethods.jsx";
+import ShippingGuide from "./pages/ShippingGuide.jsx";
+import ShippingLocations from "./pages/ShippingLocation.jsx";
+import DeliveryTime from "./pages/DeliveryTime.jsx";
 
 // Lazy-loaded صفحات
 const Home = lazy(() => import("./pages/Home.jsx"));
@@ -137,6 +150,128 @@ function AppContent() {
                   </ProtectedRouter>
                 }
               />
+
+ <Route
+                path="/myOrder"
+                element={
+                  <ProtectedRouter>
+                    <UserOrder />
+                  </ProtectedRouter>
+                }
+              />
+
+              
+ <Route
+                path="/delivery-information"
+                element={
+                  <ProtectedRouter>
+                    <ImformationOrders />
+                  </ProtectedRouter>
+                }
+              />
+
+               <Route
+                path="/blogs"
+                element={
+                  <ProtectedRouter>
+                    <Blog />
+                  </ProtectedRouter>
+                }
+              />
+
+                  <Route
+                path="/contactUs"
+                element={
+                  <ProtectedRouter>
+                    <ContactUs />
+                  </ProtectedRouter>
+                }
+              />
+
+              
+                  <Route
+                path="/Sitemap"
+                element={
+                  <ProtectedRouter>
+                    <SiteMap />
+                  </ProtectedRouter>
+                }
+              />
+
+                   <Route
+                path="/ShippingAndReturns"
+                element={
+                  <ProtectedRouter>
+                    <ShippingAndReturns />
+                  </ProtectedRouter>
+                }
+              />
+
+                        <Route
+                path="/SafeShopping"
+                element={
+                  <ProtectedRouter>
+                    <SafeShopping />
+                  </ProtectedRouter>
+                }
+              />
+
+                         <Route
+                path="/MarketingPrograms"
+                element={
+                  <ProtectedRouter>
+                    <MarketingPrograms />
+                  </ProtectedRouter>
+                }
+              />
+
+
+                             <Route
+                path="/TermsOfUse"
+                element={
+                  <ProtectedRouter>
+                    <TermsOfUse />
+                  </ProtectedRouter>
+                }
+              />
+
+                                 <Route
+                path="/PaymentMethods"
+                element={
+                  <ProtectedRouter>
+                    <PaymentMethods />
+                  </ProtectedRouter>
+                }
+              />
+
+
+                                 <Route
+                path="/ShippingGuide"
+                element={
+                  <ProtectedRouter>
+                    <ShippingGuide />
+                  </ProtectedRouter>
+                }
+              />
+
+                                      <Route
+                path="/Locations"
+                element={
+                  <ProtectedRouter>
+                    <ShippingLocations />
+                  </ProtectedRouter>
+                }
+              />
+
+                                      <Route
+                path="/DeliveryTime"
+                element={
+                  <ProtectedRouter>
+                    <DeliveryTime />
+                  </ProtectedRouter>
+                }
+              />
+
               <Route
                 path="/productDetel/:id"
                 element={

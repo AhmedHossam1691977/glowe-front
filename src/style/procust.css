@@ -300,7 +300,10 @@
 
 
   #products .product-text-overlay .header-title {
-    font-size: 3rem;
+    font-size: 2.2rem;
+  }
+  .header-subtitle {
+    font-size: 1.5rem;
   }
 
   #products .product-text-overlay .breadcrumb-links {
@@ -389,7 +392,10 @@
   }
 
   #products .product-text-overlay .header-title {
-    font-size: 1.8rem;
+    font-size: 1.1rem;
+  }
+  .header-subtitle {
+    font-size: .9rem;
   }
 
   #products .product-text-overlay .breadcrumb-links {
@@ -426,12 +432,18 @@
   }
 
   #products .product-text-overlay .header-title {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+  }
+  .header-subtitle {
+    font-size: 0.9rem;
   }
 
   #products .product-text-overlay .breadcrumb-links {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
+
+  
+
 }
 
 /* Media Query for very small devices (max-width: 399.98px) */
@@ -476,7 +488,10 @@
   }
 
   #products .product-text-overlay .header-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
+  }
+  .header-subtitle {
+    font-size: 0.6rem;
   }
 
   #products .product-text-overlay .breadcrumb-links {
@@ -488,4 +503,111 @@
     max-width: 80%;
     margin: 0 auto 5px auto;
   }
+}
+
+
+.badge{
+  background-color: #ff007f;
+}
+
+ .view-more-btn{
+    font-size: 1.5rem !important;
+    padding: 0.5rem 1rem !important;
+    color: #ff007f;
+    font-weight: 500;
+  }
+
+   .section-title{
+    font-size: 1.8rem !important;
+      padding: 0rem 1rem !important;
+    color: #ff007f;
+    font-weight: 900;
+  }
+
+/* offers mini */
+/* حجم القلب والعين في الشاشات الصغيرة */
+@media (max-width: 768px) {
+  .product-actions {
+    flex-direction: row-reverse;
+    align-items: flex-start;
+  }
+
+ .view-more-btn{
+    font-size: 1rem !important;
+    padding: 0.5rem 1rem !important;
+    color: #ff007f !important;
+    font-weight: 500 !important;
+  }
+
+   .section-title{
+    font-size: 1.2rem !important;
+      padding: 0rem 1rem !important;
+    color: #ff007f;
+    font-weight: 900;
+  }
+
+  .product-actions .btn-icon {
+    margin-left: 0.25rem;
+  }
+
+  .product-actions .d-flex.flex-column {
+    gap: 0.3rem;
+  }
+
+  .product-image-container .badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .product-card .card-body h3 {
+    font-size: 14px;
+  }
+
+  .add-to-cart-btn {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+
+  .product-card .product-price span {
+    font-size: 13px;
+  }
+}
+
+/* للشاشات الأصغر من 576px (موبايل صغير) */
+@media (max-width: 576px) {
+  .product-card .card-body {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .product-image-container .product-image {
+    height: 170px;
+    object-fit: cover;
+  }
+
+  .product-actions {
+    padding: 0.4rem !important;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .view-more-btn {
+    font-size: 0.875rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .add-to-cart-btn{
+    font-size: 10px;
+     padding: 6px 0px !important;
+  }
+
+  .product-name{
+    font-size: 1rem !important;
+  }
+
+  .product-name-mini-offres{
+    font-size: 0.9rem !important;
+  }
+
 }

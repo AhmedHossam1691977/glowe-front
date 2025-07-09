@@ -50,12 +50,12 @@ export default function ProductOfCatigory() {
         console.log(err);
       });
       setSubCatigoryOfCatigory(data.category.allSubCatigory);
-      console.log(data.category.allSubCatigory);
-      setProducts(data.category.allProduct);
-      setFilteredProducts(data.category.allProduct);
+      console.log(data.products);
+      setProducts(data.products);
+      setFilteredProducts(data.products);
       
       const initialActiveSlides = {};
-      data.allProduct.forEach(p => {
+      data.products.forEach(p => {
         initialActiveSlides[p._id] = 0;
       });
       setActiveSlideIndices(initialActiveSlides);
@@ -361,11 +361,13 @@ export default function ProductOfCatigory() {
                        </span>
                      </Link>
                    </div>
-                   {product.priceAfterDiscount && (
-                     <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
-                       خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
-                     </span>
-                   )}
+                    {product.priceAfterDiscount ?
+        <>
+          <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
+            خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
+          </span>
+        </>
+        :""}
                  </div>
            
                  <div className="card-body py-2">
@@ -379,11 +381,12 @@ export default function ProductOfCatigory() {
                      <span className="text-danger fs-6 fw-bold">
                        {product.priceAfterDiscount ? `${product.priceAfterDiscount} ج.م` : `${product.price} ج.م`}
                      </span>
-                     {product.priceAfterDiscount && (
-                       <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
-                         {product.price} ج.م
-                       </span>
-                     )}
+                     {product.priceAfterDiscount ? 
+          <>
+          <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
+              {product.price} ج.م
+            </span>
+          </>:""}
                    </div>
            
                    <div className="product-rating mb-2 fs-6 d-flex align-items-center">

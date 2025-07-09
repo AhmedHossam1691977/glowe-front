@@ -1,0 +1,161 @@
+/* التنسيقات العامة */
+.shipping-locations-container {
+  direction: rtl;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'Tajawal', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.shipping-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.header-icon {
+  font-size: 2.5rem;
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.shipping-title {
+  color: #2c3e50;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.shipping-intro {
+  color: #555;
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* قسم المحافظات */
+.governorates-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.section-icon {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-left: 10px;
+}
+
+.section-title {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* شبكة المحافظات */
+.governorates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.governorate-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border-right: 3px solid #e74c3c;
+}
+
+.governorate-card:hover {
+  background: #f1f1f1;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.gov-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* ملاحظة التواصل */
+.contact-note {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-right: 3px solid #3498db;
+}
+
+.contact-icon {
+  font-size: 1.5rem;
+  color: #3498db;
+  margin-left: 15px;
+}
+
+.contact-link {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 5px;
+  transition: color 0.3s;
+}
+
+.contact-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 768px) {
+  .governorates-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .shipping-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .shipping-locations-container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .shipping-title {
+    font-size: 1.6rem;
+  }
+  
+  .governorates-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .contact-note {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .contact-icon {
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+}

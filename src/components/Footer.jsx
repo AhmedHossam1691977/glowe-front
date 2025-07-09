@@ -17,17 +17,17 @@ const Footer = () => {
                 <Link to="/login" className="text-decoration-none footer-link-custom">تسجيل الدخول</Link>
               </li>
               <li className="mb-2">
-                <Link to="/signup" className="text-decoration-none footer-link-custom">حساب جديد</Link>
+                <Link to="/signUp" className="text-decoration-none footer-link-custom">حساب جديد</Link>
               </li>
               <li className="mb-2">
-                <Link to="/wishlist" className="text-decoration-none footer-link-custom">قائمة أمنياتي</Link>
+                <Link to="/whichList" className="text-decoration-none footer-link-custom">قائمة أمنياتي</Link>
               </li>
               <li className="mb-2">
-                <Link to="/track-order" className="text-decoration-none footer-link-custom">تتبع طلبي</Link>
+                <Link to="/myOrder" className="text-decoration-none footer-link-custom">تتبع طلبي</Link>
               </li>
-              <li className="mb-2">
+              {/* <li className="mb-2">
                 <Link to="/help" className="text-decoration-none footer-link-custom">المساعدة</Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -39,16 +39,16 @@ const Footer = () => {
                 <Link to="/delivery-information" className="text-decoration-none footer-link-custom">معلومات التوصيل</Link>
               </li>
               <li className="mb-2">
-                <Link to="/blog" className="text-decoration-none footer-link-custom">المدونة</Link>
+                <Link to="/blogs" className="text-decoration-none footer-link-custom">المدونة</Link>
               </li>
-              <li className="mb-2">
+              {/* <li className="mb-2">
                 <Link to="/faq" className="text-decoration-none footer-link-custom">الأسئلة الشائعة</Link>
+              </li> */}
+              <li className="mb-2">
+                <Link to="/contactUs" className="text-decoration-none footer-link-custom">تواصل معنا</Link>
               </li>
               <li className="mb-2">
-                <Link to="/contact" className="text-decoration-none footer-link-custom">تواصل معنا</Link>
-              </li>
-              <li className="mb-2">
-                <Link to="/sitemap" className="text-decoration-none footer-link-custom">خريطة الموقع</Link>
+                <Link to="/Sitemap" className="text-decoration-none footer-link-custom">خريطة الموقع</Link>
               </li>
             </ul>
           </div>
@@ -58,20 +58,20 @@ const Footer = () => {
             <h5 className="text-uppercase mb-4 text-white footer-title-custom">خدمات العملاء</h5>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <Link to="/shipping-returns" className="text-decoration-none footer-link-custom">الشحن والإرجاع</Link>
+                <Link to="/ShippingAndReturns" className="text-decoration-none footer-link-custom">الشحن والإرجاع</Link>
               </li>
               <li className="mb-2">
-                <Link to="/secure-shopping" className="text-decoration-none footer-link-custom">التسوق الآمن</Link>
+                <Link to="/SafeShopping" className="text-decoration-none footer-link-custom">التسوق الآمن</Link>
               </li>
-              <li className="mb-2">
+              {/* <li className="mb-2">
                 <Link to="/international-shipping" className="text-decoration-none footer-link-custom">الشحن الدولي</Link>
-              </li>
+              </li> */}
               <li className="mb-2">
-                <Link to="/affiliates" className="text-decoration-none footer-link-custom">البرامج التسويقية</Link>
+                <Link to="/MarketingPrograms" className="text-decoration-none footer-link-custom">البرامج التسويقية</Link>
               </li>
-              <li className="mb-2">
-                <Link to="/contact-us-2" className="text-decoration-none footer-link-custom">الاتصال بنا</Link> {/* يمكن تكرار أو ربط بصفحة تواصل أعمق */}
-              </li>
+              {/* <li className="mb-2">
+                <Link to="/contact-us-2" className="text-decoration-none footer-link-custom">الاتصال بنا</Link> 
+              </li> */}
             </ul>
           </div>
 
@@ -80,19 +80,19 @@ const Footer = () => {
             <h5 className="text-uppercase mb-4 text-white footer-title-custom">الدفع والشحن</h5>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <Link to="/terms-of-use" className="text-decoration-none footer-link-custom">شروط الاستخدام</Link>
+                <Link to="/TermsOfUse" className="text-decoration-none footer-link-custom">شروط الاستخدام</Link>
               </li>
               <li className="mb-2">
-                <Link to="/payment-methods" className="text-decoration-none footer-link-custom">طرق الدفع</Link>
+                <Link to="/PaymentMethods" className="text-decoration-none footer-link-custom">طرق الدفع</Link>
               </li>
               <li className="mb-2">
-                <Link to="/shipping-guide" className="text-decoration-none footer-link-custom">دليل الشحن</Link>
+                <Link to="/ShippingGuide" className="text-decoration-none footer-link-custom">دليل الشحن</Link>
               </li>
               <li className="mb-2">
-                <Link to="/locations" className="text-decoration-none footer-link-custom">المواقع التي نشحن إليها</Link>
+                <Link to="/Locations" className="text-decoration-none footer-link-custom">المواقع التي نشحن إليها</Link>
               </li>
               <li className="mb-2">
-                <Link to="/estimated-delivery" className="text-decoration-none footer-link-custom">وقت التسليم المتوقع</Link>
+                <Link to="/DeliveryTime" className="text-decoration-none footer-link-custom">وقت التسليم المتوقع</Link>
               </li>
             </ul>
           </div>

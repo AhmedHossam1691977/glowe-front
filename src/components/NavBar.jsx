@@ -10,27 +10,32 @@ import { FaHome } from "react-icons/fa";
 import { FaThLarge, FaShoppingCart, FaUserAlt, FaBoxes } from "react-icons/fa";
 import { catigoryContext } from '../context/CarigruContext.jsx';
 import "../style/nav.css"
-
+import { BiLogOut } from "react-icons/bi";
 export default function NavBar({ userdata }) {
     const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+    // New state for user account offcanvas
+    const [isUserOffcanvasOpen, setIsUserOffcanvasOpen] = useState(false);
+
     let { cartCount } = useContext(CartContext);
     let { setProduct, product } = useContext(productContext);
     let { allCatigory, getSingleCatigories } = useContext(catigoryContext);
 
 
     const navbarRef = useRef(null);
-    const offcanvasRef = useRef(null);
+    const offcanvasRef = useRef(null); // Ref for categories offcanvas
+    const userOffcanvasRef = useRef(null); // New ref for user offcanvas
     const location = useLocation();
 
-    // State for clicked category and its subcategories
+    // State for clicked category and its subcategories (desktop)
     const [clickedCategory, setClickedCategory] = useState(null);
     const [currentCategorySubcategories, setCurrentCategorySubcategories] = useState([]);
-    const [img , setImg] = useState(null);
+    const [img, setImg] = useState(null); // Image for desktop category dropdown
+
     // State for mobile subcategories
     const [mobileSubcategories, setMobileSubcategories] = useState([]);
     const [selectedMobileCategoryId, setSelectedMobileCategoryId] = useState(null);
 
-    // State for user dropdown
+    // State for user dropdown (desktop)
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
     // Fetch subcategories for mobile
@@ -55,8 +60,9 @@ export default function NavBar({ userdata }) {
             setClickedCategory(null);
             setCurrentCategorySubcategories([]);
         } else {
-            // Close user dropdown if open when a category is clicked
+            // Close user dropdown/offcanvas if open when a category is clicked
             setIsUserDropdownOpen(false);
+            setIsUserOffcanvasOpen(false);
 
             setClickedCategory(categoryId);
             try {
@@ -70,26 +76,31 @@ export default function NavBar({ userdata }) {
         }
     };
 
-    // Close user dropdown and mobile nav and category dropdown when clicking outside
+    // Close user dropdown, mobile nav, category dropdown, and user offcanvas when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            // Close mobile offcanvas
+            // Close mobile categories offcanvas
             if (offcanvasRef.current && !offcanvasRef.current.contains(event.target) && isMobileNavOpen) {
                 if (event.target.id !== 'toggleOffcanvasButton' && !event.target.closest('#toggleOffcanvasButton')) {
                     setIsMobileNavOpen(false);
                 }
             }
-            // Close user dropdown
+            // Close user dropdown (desktop)
             if (navbarRef.current && !navbarRef.current.contains(event.target) && isUserDropdownOpen) {
                 if (!event.target.closest('.dropdown-toggle') && !event.target.closest('.dropdown-menu')) {
                     setIsUserDropdownOpen(false);
                 }
             }
             // Close desktop category dropdown
-            // Check if the clicked target is *not* inside any category dropdown or its toggle
             if (clickedCategory && !event.target.closest('.category-dropdown-container')) {
                 setClickedCategory(null);
                 setCurrentCategorySubcategories([]);
+            }
+            // Close user offcanvas (mobile)
+            if (userOffcanvasRef.current && !userOffcanvasRef.current.contains(event.target) && isUserOffcanvasOpen) {
+                if (event.target.id !== 'toggleUserOffcanvasButton' && !event.target.closest('#toggleUserOffcanvasButton')) {
+                    setIsUserOffcanvasOpen(false);
+                }
             }
         };
 
@@ -97,12 +108,12 @@ export default function NavBar({ userdata }) {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [isMobileNavOpen, isUserDropdownOpen, clickedCategory]);
+    }, [isMobileNavOpen, isUserDropdownOpen, clickedCategory, isUserOffcanvasOpen]);
 
 
-    // Prevent scrolling when dropdown is open
+    // Prevent scrolling when any dropdown/offcanvas is open
     useEffect(() => {
-        if (clickedCategory || isUserDropdownOpen || isMobileNavOpen) {
+        if (clickedCategory || isUserDropdownOpen || isMobileNavOpen || isUserOffcanvasOpen) {
             document.body.classList.add('dropdown-open');
         } else {
             document.body.classList.remove('dropdown-open');
@@ -111,16 +122,16 @@ export default function NavBar({ userdata }) {
         return () => {
             document.body.classList.remove('dropdown-open');
         };
-    }, [clickedCategory, isUserDropdownOpen, isMobileNavOpen]);
+    }, [clickedCategory, isUserDropdownOpen, isMobileNavOpen, isUserOffcanvasOpen]);
 
-    // Mobile nav functions
+    // Mobile categories nav functions
     const toggleMobileNav = () => {
         setIsMobileNavOpen(!isMobileNavOpen);
-        // Close desktop category dropdown if mobile nav opens
+        // Close other dropdowns/offcanvas when this one opens
         setClickedCategory(null);
         setCurrentCategorySubcategories([]);
-        // Close user dropdown if mobile nav opens
         setIsUserDropdownOpen(false);
+        setIsUserOffcanvasOpen(false);
     };
 
     const closeMobileNav = () => {
@@ -129,6 +140,21 @@ export default function NavBar({ userdata }) {
         setSelectedMobileCategoryId(null);
         setMobileSubcategories([]);
     };
+
+    // Mobile user offcanvas functions
+    const toggleUserOffcanvas = () => {
+        setIsUserOffcanvasOpen(!isUserOffcanvasOpen);
+        // Close other dropdowns/offcanvas when this one opens
+        setIsMobileNavOpen(false);
+        setIsUserDropdownOpen(false);
+        setClickedCategory(null);
+        setCurrentCategorySubcategories([]);
+    };
+
+    const closeUserOffcanvas = () => {
+        setIsUserOffcanvasOpen(false);
+    };
+
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -142,9 +168,10 @@ export default function NavBar({ userdata }) {
 
     const handleNavLinkClick = () => {
         closeMobileNav();
-        setClickedCategory(null); // Close desktop category dropdown on any nav link click
-        setCurrentCategorySubcategories([]); // Clear subcategories
-        setIsUserDropdownOpen(false); // Close user dropdown
+        closeUserOffcanvas(); // Close user offcanvas
+        setClickedCategory(null);
+        setCurrentCategorySubcategories([]);
+        setIsUserDropdownOpen(false);
     };
 
     const isActiveLink = (path) => {
@@ -162,14 +189,11 @@ export default function NavBar({ userdata }) {
 
     const toggleUserDropdown = () => {
         setIsUserDropdownOpen(!isUserDropdownOpen);
-        // Close category dropdown if user dropdown opens
+        // Close category dropdown and user offcanvas if user dropdown opens
         setClickedCategory(null);
         setCurrentCategorySubcategories([]);
+        setIsUserOffcanvasOpen(false);
     };
-
-
-    console.log(img);
-    
 
     return (
         <>
@@ -195,7 +219,7 @@ export default function NavBar({ userdata }) {
                 </div>
 
                 {/* Desktop Navbar */}
-                <nav className="d-none d-lg-block bg-white shadow-sm my-2" dir="rtl" ref={navbarRef}>
+                <nav className="d-none d-lg-block bg-white shadow-sm my-2 " dir="rtl" ref={navbarRef}>
                     <div className="container py-2 d-flex justify-content-between align-items-center">
                         <Link className="navbar-brand fw-bold fs-4" to="/">لميع</Link>
                         <div className="input-group mx-5">
@@ -230,6 +254,11 @@ export default function NavBar({ userdata }) {
                                                 <CgProfile className='me-2' /> حسابي
                                             </Link>
                                         </li>
+                                        <li>
+                                            <Link className="dropdown-item" to="/myOrder" onClick={handleNavLinkClick}>
+                                                <FaBoxes className='me-2' /> طلباتي
+                                            </Link>
+                                        </li>
                                         <li><hr className="dropdown-divider" /></li>
                                         <li>
                                             <button className="dropdown-item text-danger" onClick={logout}>
@@ -261,95 +290,95 @@ export default function NavBar({ userdata }) {
                         )}
                     </div>
 
-                  <div className="border">
-    <div className="container d-flex justify-content-between align-items-center">
-        <div className="d-flex gap-2">
-            <Link className={`nav-link ${isActiveLink('/') ? 'active-link' : ''}`} to="/">الرئيسية</Link>
+                    <div className="border">
+                        <div className="container d-flex justify-content-between align-items-center">
+                            <div className="d-flex gap-2">
+                                <Link className={`nav-link ${isActiveLink('/') ? 'active-link' : ''}`} to="/">الرئيسية</Link>
 
-            {allCatigory && allCatigory.length > 0 ? (
-                allCatigory.map((category) => (
-                    <li
-                        className={`nav-item dropdown category-dropdown-container ${clickedCategory === category._id ? 'show' : ''}`}
-                        key={category._id}
-                    >
-                        <a
-                            className={`nav-link dropdown-toggle ${clickedCategory === category._id ? 'active-link' : ''}`}
-                            href="#"
-                            id={`navbarDropdown-${category._id}`}
-                            role="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded={clickedCategory === category._id}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleCategoryClick(category._id);
-                            }}
-                        >
-                            <span className="fw-bold text-dark">{category.name}</span>
-                        </a>
+                                {allCatigory && allCatigory.length > 0 ? (
+                                    allCatigory.map((category) => (
+                                        <li
+                                            className={`nav-item dropdown category-dropdown-container ${clickedCategory === category._id ? 'show' : ''}`}
+                                            key={category._id}
+                                        >
+                                            <a
+                                                className={`nav-link dropdown-toggle ${clickedCategory === category._id ? 'active-link' : ''}`}
+                                                href="#"
+                                                id={`navbarDropdown-${category._id}`}
+                                                role="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded={clickedCategory === category._id}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleCategoryClick(category._id);
+                                                }}
+                                            >
+                                                <span className="fw-bold text-dark">{category.name}</span>
+                                            </a>
 
-                        <div
-                            className={`dropdown-menu ${clickedCategory === category._id ? 'show' : ''} full-width-dropdown`}
-                            aria-labelledby={`navbarDropdown-${category._id}`}
-                        >
-                            <div className="container">
-                                <div className="row">
-                                    <div className="col-lg-9 col-md-8">
-                                        <div className="row">
-                                            {currentCategorySubcategories.length > 0 ? (
-                                                currentCategorySubcategories.map((subCategory) => (
-                                                    <div className="col-6 col-md-4 col-lg-3 mb-4" key={subCategory._id}>
-                                                        <Link
-                                                            to={`/productOfSubCarigory/${subCategory._id}`}
-                                                            className="d-flex flex-column align-items-center text-decoration-none text-dark subcategory-item"
-                                                            onClick={handleNavLinkClick}
-                                                        >
-                                                            <div className="subcategory-image-container">
-                                                                {subCategory.image ? (
-                                                                    <img
-                                                                        src={subCategory.image}
-                                                                        alt={subCategory.name}
-                                                                    />
+                                            <div
+                                                className={`dropdown-menu ${clickedCategory === category._id ? 'show' : ''} full-width-dropdown`}
+                                                aria-labelledby={`navbarDropdown-${category._id}`}
+                                            >
+                                                <div className="container">
+                                                    <div className="row">
+                                                        <div className="col-lg-9 col-md-8">
+                                                            <div className="row">
+                                                                {currentCategorySubcategories.length > 0 ? (
+                                                                    currentCategorySubcategories.map((subCategory) => (
+                                                                        <div className="col-6 col-md-4 col-lg-3 mb-4" key={subCategory._id}>
+                                                                            <Link
+                                                                                to={`/productOfSubCarigory/${subCategory._id}`}
+                                                                                className="d-flex flex-column align-items-center text-decoration-none text-dark subcategory-item"
+                                                                                onClick={handleNavLinkClick}
+                                                                            >
+                                                                                <div className="subcategory-image-container">
+                                                                                    {subCategory.image ? (
+                                                                                        <img
+                                                                                            src={subCategory.image}
+                                                                                            alt={subCategory.name}
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <span className="fw-bold " style={{ fontSize: '18px' }}>
+                                                                                            {subCategory.name ? subCategory.name.charAt(0) : ''}
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                                <span className="text-center mt-2" style={{ fontSize: '0.9rem' }}>
+                                                                                    {subCategory.name}
+                                                                                </span>
+                                                                            </Link>
+                                                                        </div>
+                                                                    ))
                                                                 ) : (
-                                                                    <span className="fw-bold " style={{ fontSize: '18px' }}>
-                                                                        {subCategory.name ? subCategory.name.charAt(0) : ''}
-                                                                    </span>
+                                                                    <div className="col-12 text-center py-4">
+                                                                        <p>لا توجد أقسام فرعية لهذه الفئة</p>
+                                                                    </div>
                                                                 )}
                                                             </div>
-                                                            <span className="text-center mt-2" style={{ fontSize: '0.9rem' }}>
-                                                                {subCategory.name}
-                                                            </span>
-                                                        </Link>
+                                                        </div>
+                                                        <div className='col-lg-3 col-md-4 d-flex justify-content-center align-items-center'>
+                                                            {img && (
+                                                                <img src={img} alt="Category" className="img-fluid catigory-image-container " style={{ maxHeight: '300px', objectFit: 'contain', }} />
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <div className="col-12 text-center py-4">
-                                                    <p>لا توجد أقسام فرعية لهذه الفئة</p>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className='col-lg-3 col-md-4 d-flex justify-content-center align-items-center'>
-                                        {img && (
-                                            <img src={img} alt="Category" className="img-fluid catigory-image-container " style={{ maxHeight: '300px', objectFit: 'contain' ,}} />
-                                        )}
-                                    </div>
-                                </div>
+                                            </div>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <span className="fw-bold text-muted nav-link">لا توجد أقسام رئيسية.</span>
+                                )}
                             </div>
                         </div>
-                    </li>
-                ))
-            ) : (
-                <span className="fw-bold text-muted nav-link">لا توجد أقسام رئيسية.</span>
-            )}
-        </div>
-    </div>
-</div>
+                    </div>
 
                 </nav>
 
                 {/* Mobile Navbar (Top) */}
                 <nav className="navbar d-lg-none bg-white shadow-sm custom-mobile-navbar" dir="rtl">
-                    <div className="container-fluid py-2">
+                    <div className="container-fluid ">
                         <div className="d-flex justify-content-between align-items-center w-100">
                             <div className="d-flex align-items-center">
                                 <Link className="navbar-brand m-0" to="/">
@@ -373,8 +402,8 @@ export default function NavBar({ userdata }) {
                                 )}
                             </div>
                         </div>
-                        <div className="mt-1 w-100">
-                            <div className="input-group">
+                        <div className=" w-100">
+                            <div className="input-group ">
                                 <button className="btn btn-outline-secondary-serch custom-search-btn" type="button">
                                     <i className="fas fa-search"></i>
                                 </button>
@@ -389,7 +418,7 @@ export default function NavBar({ userdata }) {
                         </div>
                     </div>
 
-                    {/* Offcanvas/Sidebar for mobile navigation */}
+                    {/* Offcanvas/Sidebar for mobile CATEGORIES navigation */}
                     <div
                         className={`offcanvas offcanvas-end ${isMobileNavOpen ? 'show' : ''}`}
                         tabIndex="-1"
@@ -468,6 +497,63 @@ export default function NavBar({ userdata }) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Offcanvas/Sidebar for mobile USER ACCOUNT */}
+                    <div
+                        className={`offcanvas offcanvas-end ${isUserOffcanvasOpen ? 'show' : ''}`}
+                        tabIndex="-1"
+                        id="offcanvasUserAccount"
+                        aria-labelledby="offcanvasUserAccountLabel"
+                        dir="rtl"
+                        ref={userOffcanvasRef} // Assign the new ref here
+                    >
+                        <div className="offcanvas-header d-flex justify-content-between align-items-center">
+                             <div>
+                                <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
+                                    حسابي
+                                </h5>
+                            </div>
+                            <div>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={closeUserOffcanvas}
+                                    aria-label="Close"
+                                    data-bs-dismiss="offcanvas"
+                                ></button>
+                            </div>
+                        </div>
+                        <div className="offcanvas-body">
+                            <ul className="list-group list-group-flush">
+                                <li className="list-group-item">
+                                    <Link to="/my-account" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                        <CgProfile className='me-2 mx-2' /> ملفي الشخصي
+                                    </Link>
+                                </li>
+                                <li className="list-group-item">
+                                    <Link to="/myOrder" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                        <FaBoxes className='me-2 mx-2' /> طلباتي
+                                    </Link>
+                                </li>
+                                <li className="list-group-item">
+                                    <Link to="/settings" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                        <i className="fas fa-cog me-2 mx-2"></i> الإعدادات
+                                    </Link>
+                                </li>
+                                <li className="list-group-item">
+                                    <Link to="/whichList" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                        <FaHeart className='me-2 text-danger mx-2' /> قائمة الأمنيات
+                                    </Link>
+                                </li>
+                                <li className="list-group-item">
+                                    <button className="d-flex align-items-center  text-danger w-100 border-0 bg-transparent text-start" onClick={() => { logout(); closeUserOffcanvas(); }}>
+                                       <BiLogOut  className='me-2 text-danger mx-2'/> تسجيل الخروج
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </nav>
 
                 {/* Bottom Navbar for Mobile */}
@@ -502,10 +588,15 @@ export default function NavBar({ userdata }) {
                             <span style={{ fontSize: '0.7rem' }}>المنتجات</span>
                         </Link>
 
-                        <Link to="/my-account" className={`text-center d-flex flex-column align-items-center text-decoration-none ${isActiveLink('/my-account') ? 'active-mobile-bottom-nav' : 'text-dark'}`}>
+                        {/* Changed this to a button to trigger the user offcanvas */}
+                        <button
+                            className={`text-center d-flex flex-column align-items-center text-decoration-none btn p-0 border-0 bg-transparent ${isUserOffcanvasOpen ? 'active-mobile-bottom-nav' : 'text-dark'}`}
+                            onClick={toggleUserOffcanvas}
+                            id="toggleUserOffcanvasButton" // Added an ID for potential use in handleClickOutside
+                        >
                             <FaUserAlt className="fs-5 mb-1" />
                             <span style={{ fontSize: '0.7rem' }}>حسابي</span>
-                        </Link>
+                        </button>
                     </div>
                 </nav>
             </div>

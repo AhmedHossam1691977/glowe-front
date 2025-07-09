@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
-import './../style/productDetels.css'; // Make sure this path is correct
+import './../style/productDetels.css';
 import { BsCartCheckFill } from "react-icons/bs";
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { AiOutlineEye } from "react-icons/ai";
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -20,108 +18,71 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [thumbsSwiper, setThumbsSwiper] = useState(null); // State for thumbs Swiper instance
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0); // State to track active main image
+  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [count, setCount] = useState(1);
-   const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const { addCart, setCartCount } = useContext(CartContext);
-   const {
-      addWishlist,
-      deletWhichData,
-      getAllWhichlistData,
-    } = useContext(whichlistContext);
-  // states for review form
+  const { addWishlist, deletWhichData, getAllWhichlistData } = useContext(whichlistContext);
   const [reviewText, setReviewText] = useState('');
   const [reviewRate, setReviewRate] = useState(5);
   const [loadingReview, setLoadingReview] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
-
-  // State to hold calculated review percentages
   const [reviewPercentages, setReviewPercentages] = useState({});
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      try {
-        const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
-        setProduct(res.data.product);
-        console.log("Fetched product details:", res.data.product);
-
-        // Calculate review percentages
-        if (res.data.product && res.data.product.AllReview) {
-          const totalReviews = res.data.product.AllReview.length;
-          if (totalReviews > 0) {
-            const starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-            res.data.product.AllReview.forEach(review => {
-              starCounts[review.rate]++;
-            });
-
-            const percentages = {};
-            for (let i = 1; i <= 5; i++) {
-              percentages[i] = Math.round((starCounts[i] / totalReviews) * 100);
-            }
-            setReviewPercentages(percentages);
-          } else {
-            setReviewPercentages({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
-          }
-        }
-
-        if (res.data.product && res.data.product.subCategory) {
-          const subCategoryId = res.data.product.subCategory;
-
-          const similarRes = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/subCategory/${subCategoryId}`);
-          console.log("Fetched similar products from subcategory:", similarRes.data);
-
-          if (similarRes.data && Array.isArray(similarRes.data.allProduct)) {
-            // Filter out the current product from similar products
-            setSimilarProducts(similarRes.data.allProduct.filter(p => p._id !== id).slice(0, 4));
-          } else {
-            console.log("No 'allProduct' array found in similar subcategory response or it's not an array.");
-            setSimilarProducts([]);
-          }
-        } else {
-          console.log("Product or subCategory ID is missing, skipping similar products fetch.");
-          setSimilarProducts([]);
-        }
-
-      } catch (err) {
-        console.error("Error fetching product details or similar products:", err);
-        setProduct(null);
-        setSimilarProducts([]);
-        toast.error('حدث خطأ أثناء جلب بيانات المنتج.');
-      }
-    };
-
     fetchProductDetails();
+    fetchWishlist();
   }, [id]);
 
-  async function handleAddToCart (productId, selectedImageUrl , count) {
-     try {
-    
-          let { data } = await addCart(productId, selectedImageUrl , count);
-          if (data.message === "success") {
-            setCartCount(data.cartItems);
-            toast.success("تم الاضافه", {
-              position: 'top-center',
-              className: 'border border-danger notefection  p-3 bg-white text-danger  fw-bolder fs- success',
-              duration: 1000,
-              icon: '👏'
-            });
-          } else {
-            throw new Error("Error adding to cart");
-          }
-        } catch (error) {
-          console.error("Error adding to cart:", error);
-          toast.error("حدث خطأ أثناء إضافة المنتج إلى السلة", {
-            position: 'top-center',
-            className: 'border border-danger notefection p-3 bg-white text-danger fw-bolder fs-4 error',
-            duration: 1000,
-            icon: '❌'
-          });
-        }
-    
+  const fetchProductDetails = async () => {
+    try {
+      const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
+      setProduct(res.data.product);
+
+      if (res.data.product && res.data.product.subCategory) {
+        const subCategoryId = res.data.product.subCategory;
+        const similarRes = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/subCategory/${subCategoryId}`);
+        setSimilarProducts(similarRes.data.allProduct.filter(p => p._id !== id).slice(0, 4));
+      } else {
+        setSimilarProducts([]);
+      }
+
+      calculateReviewPercentages(res.data.product.AllReview);
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      toast.error('حدث خطأ أثناء جلب بيانات المنتج.');
+    }
   };
 
-   async function fetchWishlist() {
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
+      setProduct(prev => ({ ...prev, AllReview: res.data.product.AllReview, rateAvg: res.data.product.rateAvg, rateCount: res.data.product.rateCount }));
+      calculateReviewPercentages(res.data.product.AllReview);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
+  };
+
+  const calculateReviewPercentages = (reviews) => {
+    const totalReviews = reviews.length;
+    if (totalReviews > 0) {
+      const starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      reviews.forEach(review => {
+        starCounts[review.rate]++;
+      });
+      const percentages = {};
+      for (let i = 1; i <= 5; i++) {
+        percentages[i] = Math.round((starCounts[i] / totalReviews) * 100);
+      }
+      setReviewPercentages(percentages);
+    } else {
+      setReviewPercentages({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
+    }
+  };
+
+  async function fetchWishlist() {
     try {
       const { data } = await getAllWhichlistData();
       setWishlistItems(data?.wishlist || []);
@@ -129,120 +90,57 @@ export default function ProductDetail() {
       console.error("Error fetching wishlist:", error);
     }
   }
-const isInWishlist = (productId) => wishlistItems.some((item) => item._id === productId);
-  async function handleAddToWishlist(id) {
-     try {
-         if (isInWishlist(id)) {
-           const { data } = await deletWhichData(id);
-           if (data.message === "success") {
-             toast.success("تم الإزالة", {
-               position: "top-center",
-               className: "border border-danger notefection p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
-               duration: 1000,
-               icon: "🗑️",
-             });
-           }
-         } else {
-           const { data } = await addWishlist(id);
-           if (data.message === "success") {
-             toast.success("تم الإضافة", {
-               position: "top-center",
-               className: "border border-danger notefection p-3 bg-white text-danger w-100 fw-bolder fs-4",
-               duration: 1000,
-               icon: "❤️",
-             });
-           }
-         }
-         fetchWishlist();
-       } catch (error) {
-         console.error("Error updating wishlist:", error);
-         toast.error("حدث خطأ أثناء تعديل قائمة الرغبات");
-       }
-    
-  }
 
+  const isInWishlist = (productId) => wishlistItems.some((item) => item._id === productId);
 
-  const increaseCount = () => {
-    setCount(prev => prev + 1);
-  };
-
-  const decreaseCount = () => {
-    if (count > 1) {
-      setCount(prev => prev - 1);
+  const handleAddToWishlist = async (id) => {
+    try {
+      if (isInWishlist(id)) {
+        const { data } = await deletWhichData(id);
+        if (data.message === "success") toast.success("تم الإزالة");
+      } else {
+        const { data } = await addWishlist(id);
+        if (data.message === "success") toast.success("تم الإضافة");
+      }
+      fetchWishlist();
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
     }
   };
+
+  const handleAddToCart = async (productId, selectedImageUrl, count) => {
+    try {
+      let { data } = await addCart(productId, selectedImageUrl, count);
+      if (data.message === "success") {
+        setCartCount(data.cartItems);
+        toast.success("تم الاضافه");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  };
+
+  const increaseCount = () => setCount(prev => prev + 1);
+  const decreaseCount = () => count > 1 && setCount(prev => prev - 1);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-
-    if (!reviewText.trim()) {
-      toast.error('من فضلك اكتب تعليق للتقييم.', {
-        position: "top-center",
-        className: "toast-warning",
-        duration: 1500,
-      });
-      return;
-    }
-
+    if (!reviewText.trim()) return toast.error('من فضلك اكتب تعليق للتقييم.');
     setLoadingReview(true);
-
     try {
-      const payload = {
-        text: reviewText,
-        rate: reviewRate,
-        product: id,
-      };
-
+      const payload = { text: reviewText, rate: reviewRate, product: id };
       await axios.post('https://final-pro-api-j1v7.onrender.com/api/v1/review', payload, {
-        headers: {
-          token: localStorage.getItem("token"),
-        },
+        headers: { token: localStorage.getItem("token") },
       });
-
-      const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
-      setProduct(res.data.product);
-
-      if (res.data.product && res.data.product.AllReview) {
-        const totalReviews = res.data.product.AllReview.length;
-        if (totalReviews > 0) {
-          const starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-          res.data.product.AllReview.forEach(review => {
-            starCounts[review.rate]++;
-          });
-
-          const percentages = {};
-          for (let i = 1; i <= 5; i++) {
-            percentages[i] = Math.round((starCounts[i] / totalReviews) * 100);
-          }
-          setReviewPercentages(percentages);
-        } else {
-          setReviewPercentages({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
-        }
-      }
-
+      await fetchReviews();
       setReviewText('');
       setReviewRate(5);
-      toast.success("تم إضافة تقييمك بنجاح!", {
-        position: "top-center",
-        className: "border border-danger notefection p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
-        duration: 1000,
-        icon: "✨",
-      });
+      toast.success("تم إضافة تقييمك بنجاح!");
     } catch (error) {
-      console.error("Error submitting review:", error);
       if (error.response?.data?.error === 'You have already created a review before') {
-        toast.error("لقد قمت بإضافة تقييم لهذا المنتج من قبل.", {
-          position: "top-center",
-          className: "border border-danger notefection p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
-          duration: 1000,
-          icon: "💡",
-        });
+        toast.error("لقد قمت بإضافة تقييم لهذا المنتج من قبل.");
       } else {
-        toast.error('حدث خطأ أثناء إضافة التقييم. حاول مرة أخرى.', {
-          position: "top-center",
-          className: "toast-error",
-          duration: 2000,
-        });
+        toast.error('حدث خطأ أثناء إضافة التقييم. حاول مرة أخرى.');
       }
     } finally {
       setLoadingReview(false);
@@ -253,27 +151,18 @@ const isInWishlist = (productId) => wishlistItems.some((item) => item._id === pr
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
     return (
       <>
-        {Array.from({ length: fullStars }).map((_, i) => (
-          <i key={`full-${i}`} className="fas fa-star filled-star"></i>
-        ))}
+        {Array.from({ length: fullStars }).map((_, i) => <i key={`full-${i}`} className="fas fa-star filled-star"></i>)}
         {hasHalfStar && <i className="fas fa-star-half-alt filled-star"></i>}
-        {Array.from({ length: emptyStars }).map((_, i) => (
-          <i key={`empty-${i}`} className="far fa-star empty-star"></i>
-        ))}
+        {Array.from({ length: emptyStars }).map((_, i) => <i key={`empty-${i}`} className="far fa-star empty-star"></i>)}
       </>
     );
   };
 
-  // Helper to format date for reviews
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('ar-EG', options);
-  };
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ar-EG');
 
-  if (!product) return <div className="loading-spinner text-danger fs-1"></div>;
+  if (!product) return <div>جار التحميل...</div>;
 
 
   console.log("sads",product.AllReview);
