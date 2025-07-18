@@ -66,3 +66,14 @@
     font-size: 1.1rem;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1024.98px) {
+    .category-circle {
+    width: 250px !important;
+    height: 250px !important;
+  }
+
+  .category-name {
+    font-size: 1.5rem;
+  }
+}

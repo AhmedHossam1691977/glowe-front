@@ -49,6 +49,9 @@ import PaymentMethods from "./pages/PaymentMethods.jsx";
 import ShippingGuide from "./pages/ShippingGuide.jsx";
 import ShippingLocations from "./pages/ShippingLocation.jsx";
 import DeliveryTime from "./pages/DeliveryTime.jsx";
+import UserSetting from "./pages/UserSetting.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import LoginPopup from "./pages/LoginPopup.jsx";
 
 // Lazy-loaded صفحات
 const Home = lazy(() => import("./pages/Home.jsx"));
@@ -63,37 +66,41 @@ function AppContent() {
   const [userdata, setuserdata] = useState(null);
   const [loadingPage, setLoadingPage] = useState(false);
   const location = useLocation();
+ 
 
+  
+  
   function savedata(data) {
     setuserdata(data);
   }
 
+  // ✅ جلب بيانات المستخدم من التوكن أول ما يدخل الموقع
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      let token = localStorage.getItem("token");
-      let data = jwtDecode(token);
-      savedata(data);
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const data = jwtDecode(token);
+        savedata(data);
+        console.log("✅ User Data Loaded:", data);
+      } catch (err) {
+        console.error("❌ فشل في قراءة التوكن:", err);
+      }
     }
   }, []);
 
+  // ✅ Animation بسيطة أثناء التنقل بين الصفحات
   useEffect(() => {
     setLoadingPage(true);
     const timer = setTimeout(() => setLoadingPage(false), 400);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  // ✨ تعريف المسارات التي لا يجب أن يظهر فيها الـ Navbar والـ Footer
-  const noHeaderFooterPaths = ['/login', '/signUp', '/resetEmail'  ,'/forgetpass' ,'/verefyCode','/resetPassword'];
-
-  // ✨ التحقق مما إذا كان المسار الحالي ضمن القائمة
-  const shouldShowHeaderAndFooter = !noHeaderFooterPaths.includes(location.pathname);
-
   return (
     <div className="app" dir="rtl">
       <Toaster position="top-center" />
 
-      {/* ✨ عرض NavBar بشكل شرطي */}
-      {shouldShowHeaderAndFooter && <NavBar userdata={userdata} />}
+      {/* ✅ تمرير بيانات المستخدم إلى الـ NavBar */}
+      <NavBar userdata={userdata} />
 
       <main className="main-content container-fluide">
         {loadingPage ? (
@@ -108,221 +115,68 @@ function AppContent() {
               <Route path="/blog" element={<div>Blog</div>} />
               <Route path="/faq" element={<div>FAQ</div>} />
 
-              {/* هذه الروابط يجب أن تكون هنا داخل <Routes> */}
+              {/* ✅ صفحات تسجيل الدخول */}
               <Route path="/login" element={<Login savedata={savedata} />} />
               <Route path="/signUp" element={<SignUp />} />
               <Route path="/resetEmail" element={<ResetEmail savedata={savedata} />} />
-              <Route path="/forgetpass" element={<ForgetPassword/>} />
-              <Route path="/verefyCode" element={<VerefyCode/>} />
-              <Route path="/resetPassword" element={<ResetPassword/>} />
+              <Route path="/forgetpass" element={<ForgetPassword />} />
+              <Route path="/verefyCode" element={<VerefyCode />} />
+              <Route path="/resetPassword" element={<ResetPassword />} />
+              <Route path="/loginPopup" element={<Login savedata={savedata} onClose={() => {}} />} />
 
+              {/* ✅ صفحات محمية */}
+              <Route path="/productOffer" element={<ProductOffer />} />
+              <Route path="/cart" element={<ProtectedRouter><Cart /></ProtectedRouter>} />
+              <Route path="/checkout/:id" element={<ProtectedRouter><CreatCashOrder /></ProtectedRouter>} />
+              <Route path="/whichList" element={<ProtectedRouter><WhichList /></ProtectedRouter>} />
+              <Route path="/myOrder" element={<ProtectedRouter><UserOrder /></ProtectedRouter>} />
+              <Route path="/my-setting" element={<ProtectedRouter><UserSetting  /></ProtectedRouter>} />
 
-              <Route
-                path="/productOffer"
-                element={
-                    <ProductOffer />
-                }
-              />
+              {/* ✅ الصفحات العامة */}
+              <Route path="/delivery-information" element={<ImformationOrders />} />
+              <Route path="/blogs" element={<Blog />} />
+              <Route path="/contactUs" element={<ContactUs />} />
+              <Route path="/Sitemap" element={<SiteMap />} />
+              <Route path="/ShippingAndReturns" element={<ShippingAndReturns />} />
+              <Route path="/SafeShopping" element={<SafeShopping />} />
+              <Route path="/MarketingPrograms" element={<MarketingPrograms />} />
+              <Route path="/TermsOfUse" element={<TermsOfUse />} />
+              <Route path="/PaymentMethods" element={<PaymentMethods />} />
+              <Route path="/ShippingGuide" element={<ShippingGuide />} />
+              <Route path="/Locations" element={<ShippingLocations />} />
+              <Route path="/DeliveryTime" element={<DeliveryTime />} />
+              <Route path="/productDetel/:id" element={<ProductDetel />} />
+              <Route path="/productOfCatigory/:id" element={<ProductOfCatigory />} />
+              <Route path="/productOfSubCarigory/:id" element={<ProductOfSubCarigory />} />
 
-
-              <Route
-                path="/cart"
-                element={
-                  <ProtectedRouter>
-                    <Cart />
-                  </ProtectedRouter>
-                }
-              />
-           
-           <Route
-                path="/checkout/:id"
-                element={
-                  <ProtectedRouter>
-                    <CreatCashOrder />
-                  </ProtectedRouter>
-                }
-              />
-              <Route
-                path="/whichList"
-                element={
-                  <ProtectedRouter>
-                    <WhichList />
-                  </ProtectedRouter>
-                }
-              />
-
- <Route
-                path="/myOrder"
-                element={
-                  <ProtectedRouter>
-                    <UserOrder />
-                  </ProtectedRouter>
-                }
-              />
-
-              
- <Route
-                path="/delivery-information"
-                element={
-                  <ProtectedRouter>
-                    <ImformationOrders />
-                  </ProtectedRouter>
-                }
-              />
-
-               <Route
-                path="/blogs"
-                element={
-                  <ProtectedRouter>
-                    <Blog />
-                  </ProtectedRouter>
-                }
-              />
-
-                  <Route
-                path="/contactUs"
-                element={
-                  <ProtectedRouter>
-                    <ContactUs />
-                  </ProtectedRouter>
-                }
-              />
-
-              
-                  <Route
-                path="/Sitemap"
-                element={
-                  <ProtectedRouter>
-                    <SiteMap />
-                  </ProtectedRouter>
-                }
-              />
-
-                   <Route
-                path="/ShippingAndReturns"
-                element={
-                  <ProtectedRouter>
-                    <ShippingAndReturns />
-                  </ProtectedRouter>
-                }
-              />
-
-                        <Route
-                path="/SafeShopping"
-                element={
-                  <ProtectedRouter>
-                    <SafeShopping />
-                  </ProtectedRouter>
-                }
-              />
-
-                         <Route
-                path="/MarketingPrograms"
-                element={
-                  <ProtectedRouter>
-                    <MarketingPrograms />
-                  </ProtectedRouter>
-                }
-              />
-
-
-                             <Route
-                path="/TermsOfUse"
-                element={
-                  <ProtectedRouter>
-                    <TermsOfUse />
-                  </ProtectedRouter>
-                }
-              />
-
-                                 <Route
-                path="/PaymentMethods"
-                element={
-                  <ProtectedRouter>
-                    <PaymentMethods />
-                  </ProtectedRouter>
-                }
-              />
-
-
-                                 <Route
-                path="/ShippingGuide"
-                element={
-                  <ProtectedRouter>
-                    <ShippingGuide />
-                  </ProtectedRouter>
-                }
-              />
-
-                                      <Route
-                path="/Locations"
-                element={
-                  <ProtectedRouter>
-                    <ShippingLocations />
-                  </ProtectedRouter>
-                }
-              />
-
-                                      <Route
-                path="/DeliveryTime"
-                element={
-                  <ProtectedRouter>
-                    <DeliveryTime />
-                  </ProtectedRouter>
-                }
-              />
-
-              <Route
-                path="/productDetel/:id"
-                element={
-                  <ProtectedRouter>
-                    <ProductDetel />
-                  </ProtectedRouter>
-                }
-              />
-                 <Route
-                path="/productOfCatigory/:id"
-                element={
-                  <ProtectedRouter>
-                    <ProductOfCatigory />
-                  </ProtectedRouter>
-                }
-              />
-              <Route
-                path="/productOfSubCarigory/:id"
-                element={
-                  <ProtectedRouter>
-                    <ProductOfSubCarigory />
-                  </ProtectedRouter>
-                }
-              />
-
+              {/* صفحة غير موجودة */}
               <Route path="/*" element={<NotFound />} />
             </Routes>
           </Suspense>
         )}
       </main>
 
-      {/* ✨ عرض Footer بشكل شرطي */}
-      {shouldShowHeaderAndFooter && <Footer />}
+      <Footer />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <CatigoryContextProvider>
-    <SubCatigoryContextProvider>
-      <ProductContextProvider>
-        <CartContextProvider>
-          <WhichlistContextProvider>
-            <Router>
-              <AppContent />
-            </Router>
-          </WhichlistContextProvider>
-        </CartContextProvider>
-      </ProductContextProvider>
-    </SubCatigoryContextProvider>
-    </CatigoryContextProvider>
+    <AuthProvider>
+      <CatigoryContextProvider>
+        <SubCatigoryContextProvider>
+          <ProductContextProvider>
+            <CartContextProvider>
+              <WhichlistContextProvider>
+                <Router>
+                  <AppContent />
+                </Router>
+              </WhichlistContextProvider>
+            </CartContextProvider>
+          </ProductContextProvider>
+        </SubCatigoryContextProvider>
+      </CatigoryContextProvider>
+    </AuthProvider>
   );
 }

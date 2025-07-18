@@ -1,15 +1,18 @@
 import axios from "axios";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom"; // Import Link for navigation
 import * as Yup from "yup";
+import toast, { Toaster } from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 export default function Login({ savedata }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const baseUrl = "https://final-pro-api-j1v7.onrender.com";
   const navigate = useNavigate();
-
+ let { setUserName } = useContext(AuthContext);
   // ✅ Schema: identifier = email OR phone
   const validationSchema = Yup.object({
     identifier: Yup.string()
@@ -25,7 +28,7 @@ export default function Login({ savedata }) {
       ),
     password: Yup.string()
       .required("كلمة المرور مطلوبة")
-      .matches(/^[a-zA-Z0-9]{6,}$/, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/, "كلمة المرور يجب أن تكون 6 أحرف على الأقل و تحتوي علي احرف كبيره و علامه علي الاقل "),
   });
 
   const loginForm = useFormik({
@@ -37,6 +40,7 @@ export default function Login({ savedata }) {
     onSubmit,
   });
 
+  
   async function onSubmit(values) {
     setLoading(true);
     setErrorMessage("");
@@ -44,13 +48,23 @@ export default function Login({ savedata }) {
 
     try {
       const { data } = await axios.post(`${baseUrl}/api/v1/auth/signin`, values);
-
       if (data.message === "successful") {
         localStorage.setItem("token", data.token);
         savedata(data.token);
+        
+        
+        setUserName(jwtDecode(data.token)); // Set the username in state
         navigate("/"); // Redirect without page refresh
+         toast.success('تم تسجيل الدخول بنجاح');
+      }else {
+        setErrorMessage("فشل تسجيل الدخول، يرجى التحقق من بيانات الاعتماد الخاصة بك");
       }
     } catch (error) {
+      console.log("Error during login:", error.response?.data.message);
+      if(error.response?.data.message==='The activation code has been sent again to your email'){
+         toast.success('تم إرسال كود التفعيل مرة أخرى إلى بريدك الإلكتروني');
+         navigate("/resetEmail");
+      }
       setErrorMessage(error.response?.data?.error || "حدث خطأ أثناء تسجيل الدخول");
     } finally {
       setLoading(false);

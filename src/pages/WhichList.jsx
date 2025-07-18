@@ -1,12 +1,17 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { FaHeart, FaRegHeart, FaShoppingCart, FaTimes } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; // تأكد من استيراد Bootstrap
 import toast from 'react-hot-toast';
 import { whichlistContext } from '../context/WhichListcontext.jsx';
 import { CartContext } from '../context/CartContext.jsx'; // استيراد CartContext لإضافة للسلة
 
 export default function WhichList() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   const nav = useNavigate();
   const { getAllWhichlistData, deletWhichData, setWhichlistProduct } = useContext(whichlistContext);
   const { addToCart, setCartCount } = useContext(CartContext); // جلب دالة addToCart من سياق السلة

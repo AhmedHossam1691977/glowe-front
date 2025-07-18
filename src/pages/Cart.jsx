@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { FaShoppingCart, FaTimes, FaPlus, FaMinus } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import toast from 'react-hot-toast';
 import { CartContext } from '../context/CartContext.jsx';
 // تم إزالة استيراد axios لأنه لن يتم استخدامه مباشرة هنا للدفع
 
 export default function Cart() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   let nav = useNavigate();
   const {
     getAllCartData,
@@ -37,7 +42,8 @@ export default function Cart() {
   async function fetchCartData() {
     try {
       const { data } = await getAllCartData();
-
+      console.log("Cart Data:", data);
+      
       if (data && data.cart && data.cart.cartItems && data.cart.cartItems.length > 0) {
         setCartItems(data.cart.cartItems);
         const total = calculateTotal(data.cart.cartItems);

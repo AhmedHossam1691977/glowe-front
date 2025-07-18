@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import '../style/UserOrder.css'; // تأكد من وجود هذا الملف وتضمينه الأنماط اللازمة
+import { useLocation } from 'react-router-dom';
 
 export default function UserOrder() {
   const [orders, setOrders] = useState([]);
@@ -9,6 +10,12 @@ export default function UserOrder() {
   const [expandedOrderId, setExpandedOrderId] = useState(null); // تم تغيير الاسم ليكون أوضح
   const [isLoading, setIsLoading] = useState(true); // حالة جديدة لتتبع التحميل
   const [error, setError] = useState(null); // حالة جديدة لتتبع الأخطاء
+
+    const { pathname } = useLocation();
+    useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
 
   const socketUrl = 'https://final-pro-api-j1v7.onrender.com';
 
@@ -145,6 +152,9 @@ export default function UserOrder() {
           filteredOrders.map(order => {
             const statusInfo = getStatusDisplay(order.state); // الحصول على معلومات الحالة
 
+            console.log("sdsd",order.orderItems);
+            
+
             return (
               <div key={order._id} className="order-card">
                 <div className="order-header" onClick={() => toggleOrderDetails(order._id)}>
@@ -229,9 +239,9 @@ export default function UserOrder() {
                                 <h5>{item.product?.title || 'اسم المنتج غير متوفر'}</h5>
                                 <p>الكمية: {item.quantity || 1}</p>
                                 <p>السعر: {item.price || '0'} ج.م</p>
-                                {item.product?.priceAfterDiscount && (
-                                  <p className="discounted-price">السعر بعد الخصم: {item.product.priceAfterDiscount} ج.م</p>
-                                )}
+                                {item.product.priceAfterDiscount ? (
+                                  <p className="text-primary fw-bold">السعر بعد الخصم: {item.product.priceAfterDiscount} ج.م</p>
+                                ): ""}
                               </div>
                             </div>
                           ))

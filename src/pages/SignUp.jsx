@@ -22,14 +22,15 @@ export default function SignUp() {
       .min(3, "يجب أن يكون الاسم على الأقل 3 أحرف")
       .max(20, "يجب ألا يزيد الاسم عن 20 حرفًا"),
 
-    email: Yup.string()
-      .email("يرجى إدخال بريد إلكتروني صالح")
-      .required("البريد الإلكتروني مطلوب")
-      .min(3, "يجب أن يكون البريد الإلكتروني على الأقل 3 أحرف"),
+   email: Yup.string()
+    .email("يرجى إدخال بريد إلكتروني صالح")
+    .required("البريد الإلكتروني مطلوب")
+    .matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "يجب أن يكون البريد الإلكتروني على Gmail فقط")
+    .min(3, "يجب أن يكون البريد الإلكتروني على الأقل 3 أحرف"),
 
     password: Yup.string()
       .required("كلمة المرور مطلوبة")
-      .matches(/^[a-zA-Z0-9]{6,}$/, "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل، وتشمل أحرفًا وأرقامًا"),
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/, "كلمة المرور يجب أن تكون 6 أحرف على الأقل و تحتوي علي احرف كبيره و علامه علي الاقل "),
 
     confirmPassword: Yup.string()
       .required("تأكيد كلمة المرور مطلوب")
@@ -62,7 +63,7 @@ export default function SignUp() {
 
       if (data.message === "success") {
         toast.success("تم التسجيل بنجاح! راجع بريدك الإلكتروني لتفعيل الحساب");
-        navigate("/resetEmail"); // Assuming this navigates to a page for email verification
+         navigate("/resetEmail", { state: { email: values.email } });
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.error || "حدث خطأ أثناء التسجيل");

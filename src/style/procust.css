@@ -52,7 +52,7 @@
   overflow: hidden;
   border-radius: 15px; /* Consistent with slider */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  padding-bottom: 20%; /* Aspect ratio for rectangular shape */
+  padding-bottom: 30%; /* Aspect ratio for rectangular shape */
   height: 0; /* Important for padding-bottom aspect ratio */
 }
 
@@ -292,9 +292,10 @@
 }
 
 /* Media Query for Tablets (min-width: 768px) */
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1024.98px) {
+
   #products .product-image-container {
-    padding-bottom: 25%; /* Slightly taller for tablets */
+    padding-bottom: 40% !important; /* Slightly taller for tablets */
   }
 
 
@@ -388,7 +389,7 @@
   
   /* Product Header Image Container Adjustments for small screens */
   #products .product-image-container {
-    padding-bottom: 40%; /* Taller on phones */
+    padding-bottom: 50% !important; /* Taller on phones */
   }
 
   #products .product-text-overlay .header-title {
@@ -428,7 +429,7 @@
 
   /* Product Header Image Container Adjustments for extra small screens */
   #products .product-image-container {
-    padding-bottom: 50%; /* Even taller on very small phones */
+    padding-bottom: 50% !important; /* Even taller on very small phones */
   }
 
   #products .product-text-overlay .header-title {

@@ -11,7 +11,15 @@ import { FaThLarge, FaShoppingCart, FaUserAlt, FaBoxes } from "react-icons/fa";
 import { catigoryContext } from '../context/CarigruContext.jsx';
 import "../style/nav.css"
 import { BiLogOut } from "react-icons/bi";
+import { IoIosSettings } from "react-icons/io";
+import { AuthContext } from '../context/AuthContext.jsx';
+
+
 export default function NavBar({ userdata }) {
+    const { userName } = useContext(AuthContext);
+   
+    console.log('userName in NavBar:', userName);
+    
     const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
     // New state for user account offcanvas
     const [isUserOffcanvasOpen, setIsUserOffcanvasOpen] = useState(false);
@@ -213,7 +221,7 @@ export default function NavBar({ userdata }) {
                         </div>
                         <div className="d-flex gap-3">
                             <Link className={`text-white text-decoration-none ${isActiveLink('/about') ? 'active-link' : ''}`} to="/about">من نحن</Link>
-                            <Link className={`text-white text-decoration-none ${isActiveLink('/return-policy') ? 'active-link' : ''}`} to="/return-policy">سياسية الاسترجاع</Link>
+                            <Link className={`text-white text-decoration-none ${isActiveLink('/ShippingAndReturns') ? 'active-link' : ''}`} to="/ShippingAndReturns">سياسية الاسترجاع</Link>
                         </div>
                     </div>
                 </div>
@@ -246,12 +254,12 @@ export default function NavBar({ userdata }) {
                                         aria-expanded={isUserDropdownOpen}
                                     >
                                         <CgProfile className='fs-4' />
-                                        <span className='fw-bold'>أهلاً {userdata.name || 'مستخدم'}</span>
+                                        <span className='fw-bold'>أهلاً {userName.name || 'مستخدم'}</span>
                                     </button>
                                     <ul className={`dropdown-menu ${isUserDropdownOpen ? 'show' : ''}`} aria-labelledby="userDropdown" dir="rtl">
                                         <li>
-                                            <Link className="dropdown-item" to="/my-account" onClick={handleNavLinkClick}>
-                                                <CgProfile className='me-2' /> حسابي
+                                            <Link className="dropdown-item" to="/my-setting" onClick={handleNavLinkClick}>
+                                                <IoIosSettings className='me-2' /> الإعدادات الشخصية
                                             </Link>
                                         </li>
                                         <li>
@@ -524,32 +532,44 @@ export default function NavBar({ userdata }) {
                             </div>
                         </div>
                         <div className="offcanvas-body">
-                            <ul className="list-group list-group-flush">
-                                <li className="list-group-item">
-                                    <Link to="/my-account" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
-                                        <CgProfile className='me-2 mx-2' /> ملفي الشخصي
-                                    </Link>
-                                </li>
-                                <li className="list-group-item">
-                                    <Link to="/myOrder" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
-                                        <FaBoxes className='me-2 mx-2' /> طلباتي
-                                    </Link>
-                                </li>
-                                <li className="list-group-item">
-                                    <Link to="/settings" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
-                                        <i className="fas fa-cog me-2 mx-2"></i> الإعدادات
-                                    </Link>
-                                </li>
-                                <li className="list-group-item">
-                                    <Link to="/whichList" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
-                                        <FaHeart className='me-2 text-danger mx-2' /> قائمة الأمنيات
-                                    </Link>
-                                </li>
-                                <li className="list-group-item">
-                                    <button className="d-flex align-items-center  text-danger w-100 border-0 bg-transparent text-start" onClick={() => { logout(); closeUserOffcanvas(); }}>
-                                       <BiLogOut  className='me-2 text-danger mx-2'/> تسجيل الخروج
-                                    </button>
-                                </li>
+                             <ul className="list-group list-group-flush">
+                                {userdata ? (
+                                    <>
+                                        <li className="list-group-item">
+                                            <Link to="/myOrder" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                                <FaBoxes className='me-2 mx-2' /> طلباتي
+                                            </Link>
+                                        </li>
+                                        <li className="list-group-item">
+                                            <Link to="/whichList" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                                <FaHeart className='me-2 text-danger mx-2' /> قائمة الأمنيات
+                                            </Link>
+                                        </li>
+                                        <li className="list-group-item">
+                                            <Link to="/my-setting" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                                <IoIosSettings className='me-2 mx-2' /> الإعدادات الشخصية
+                                            </Link>
+                                        </li>
+                                        <li className="list-group-item">
+                                            <button className="d-flex align-items-center text-decoration-none text-danger btn btn-link p-0" onClick={logout} style={{ border: 'none', background: 'none' }}>
+                                                <BiLogOut className='me-2 mx-2' /> تسجيل الخروج
+                                            </button>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <>
+                                        <li className="list-group-item">
+                                            <Link to="/login" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                                <CgProfile className='me-2 mx-2' /> تسجيل الدخول
+                                            </Link>
+                                        </li>
+                                        <li className="list-group-item">
+                                            <Link to="/signUp" className="d-flex align-items-center text-decoration-none text-dark" onClick={handleNavLinkClick}>
+                                                <FaUserAlt className='me-2 mx-2' /> إنشاء حساب جديد
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
                             </ul>
                         </div>
                     </div>

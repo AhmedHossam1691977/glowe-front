@@ -9,19 +9,11 @@ export default function Catigory() {
 
     // Optional: Fetch categories when the component mounts if not already fetched in context
     useEffect(() => {
-        if (!allCatigory || allCatigory.length === 0) {
-            // Assuming getSingleCatigories is meant to fetch all or you have another function
-            // If getSingleCatigories fetches a single category, you might need an 'getAllCategories' in your context
-            // For now, let's assume `allCatigory` is populated elsewhere or this component will not display categories if it's empty.
-            // If `getSingleCatigories` can fetch all when called without an ID, use it.
-            // Otherwise, make sure `allCatigory` is correctly populated by your context provider.
-        }
+        if (!allCatigory || allCatigory.length === 0)
+            console.warn("No categories available or not fetched yet.");
     }, [allCatigory]); // Dependency array to prevent infinite loops
 
     const handleCategoryClick = async (categoryId) => {
-        // Optional: If you need to fetch data for the single category before navigating
-        // await getSingleCatigories(categoryId); 
-        // Then navigate
         navigate(`/productOfCatigory/${categoryId}`);
     };
 

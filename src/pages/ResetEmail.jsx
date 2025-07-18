@@ -1,11 +1,17 @@
 import axios from "axios";
 import { useFormik } from "formik";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import toast, { Toaster } from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 export default function VerifyEmailCode({ savedata }) {
+   const [errorMessage, setErrorMessage] = useState("");
+  const location = useLocation();
+const email = location.state?.email;
+   let { setUserName } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const baseUrl = "https://final-pro-api-j1v7.onrender.com";
   const navigate = useNavigate();
@@ -19,31 +25,42 @@ export default function VerifyEmailCode({ savedata }) {
   const verifyForm = useFormik({
     initialValues: {
       code: "",
+      email: email || "",
     },
     validationSchema,
     onSubmit,
   });
 
-  async function onSubmit(values) {
-    setLoading(true);
+async function onSubmit(values) {
+  setErrorMessage("");
+  setLoading(true);
 
-    try {
-      const { data } = await axios.post(`${baseUrl}/api/v1/auth/resetEmail`, values);
+  try {
+    const { data } = await axios.post(`${baseUrl}/api/v1/auth/resetEmail`, values);
 
-      if (data.message === "success") {
-        toast.success("تم التحقق من البريد الإلكتروني بنجاح!");
-        localStorage.setItem("token", data.token);
-        savedata(data.token);
-        navigate("/mapBox"); // Redirect to the map page
-      } else {
-        toast.error("الكود غير صحيح، حاول مرة أخرى.");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error || "حدث خطأ أثناء التحقق من الكود");
-    } finally {
-      setLoading(false);
+    if (data.message === "success") {
+      toast.success("تم التحقق من البريد الإلكتروني بنجاح!");
+      localStorage.setItem("token", data.token);
+      savedata(data.token);
+      setUserName(jwtDecode(data.token));
+      navigate("/");
+    } else {
+      setErrorMessage("الكود غير صحيح، حاول مرة أخرى.");
+      toast.error("الكود غير صحيح، حاول مرة أخرى.");
     }
+
+  } catch (error) {
+
+    if (error.response?.status === 429) {
+
+      setErrorMessage("تم حظرك مؤقتًا. حاول لاحقًا.");
+    } else {
+     setErrorMessage("حدث خطأ أثناء التحقق من الكود. يرجى المحاولة مرة أخرى.");
+    }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div
@@ -67,6 +84,8 @@ export default function VerifyEmailCode({ savedata }) {
       >
         <Toaster position="top-center" />
         <h2 className="mb-4 text-center">التحقق من البريد الإلكتروني</h2>
+
+ {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
         <form noValidate onSubmit={verifyForm.handleSubmit}>
           <div className="mb-3">

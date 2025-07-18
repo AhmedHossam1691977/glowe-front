@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
 import './../style/productDetels.css';
@@ -12,9 +12,17 @@ import 'swiper/css/pagination';
 import { Navigation, FreeMode, Thumbs } from 'swiper/modules';
 import { CartContext } from '../context/CartContext.jsx';
 import { whichlistContext } from '../context/WhichListcontext.jsx';
+// import { AuthContext } from '../context/AuthContext.jsx'; // <--- تم إلغاء استيراد AuthContext
+// import LoginPopup from './LoginPopup.jsx'; // <--- تم إزالة هذا الاستيراد
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import Loader from '../components/Loader.jsx'; // Make sure this import is correct
 
 export default function ProductDetail() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -24,21 +32,29 @@ export default function ProductDetail() {
   const [wishlistItems, setWishlistItems] = useState([]);
   const { addCart, setCartCount } = useContext(CartContext);
   const { addWishlist, deletWhichData, getAllWhichlistData } = useContext(whichlistContext);
+  // const { isLoggedIn } = useContext(AuthContext); // <--- تم إلغاء الحصول على حالة تسجيل الدخول
+  // const [showLoginPopup, setShowLoginPopup] = useState(false); // <--- تم إزالة هذه الحالة
+
   const [reviewText, setReviewText] = useState('');
   const [reviewRate, setReviewRate] = useState(5);
   const [loadingReview, setLoadingReview] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [reviewPercentages, setReviewPercentages] = useState({});
+  const [loadingProduct, setLoadingProduct] = useState(true); // New state for product loading
 
   useEffect(() => {
     fetchProductDetails();
-    fetchWishlist();
-  }, [id]);
+    fetchWishlist(); // تم تغيير هذه الدالة ليتم جلب قائمة الأمنيات دائمًا
+  }, [id]); // تم إزالة isLoggedIn كـ dependency
 
   const fetchProductDetails = async () => {
+    setLoadingProduct(true); // Start loading
     try {
       const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
+      console.log(res.data.product);
+      
       setProduct(res.data.product);
+      console.log("Initial product details fetched:", res.data.product);
 
       if (res.data.product && res.data.product.subCategory) {
         const subCategoryId = res.data.product.subCategory;
@@ -52,6 +68,8 @@ export default function ProductDetail() {
     } catch (err) {
       console.error("Error fetching product details:", err);
       toast.error('حدث خطأ أثناء جلب بيانات المنتج.');
+    } finally {
+      setLoadingProduct(false); // End loading, whether successful or not
     }
   };
 
@@ -60,6 +78,7 @@ export default function ProductDetail() {
       const res = await axios.get(`https://final-pro-api-j1v7.onrender.com/api/v1/product/${id}`);
       setProduct(prev => ({ ...prev, AllReview: res.data.product.AllReview, rateAvg: res.data.product.rateAvg, rateCount: res.data.product.rateCount }));
       calculateReviewPercentages(res.data.product.AllReview);
+      console.log("Reviews fetched after update/add:", res.data.product.AllReview);
     } catch (err) {
       console.error("Error fetching reviews:", err);
     }
@@ -88,35 +107,78 @@ export default function ProductDetail() {
       setWishlistItems(data?.wishlist || []);
     } catch (error) {
       console.error("Error fetching wishlist:", error);
+      // يمكنك التعامل مع أخطاء الـ API هنا إذا كانت بسبب عدم المصادقة
+      // إذا كان الخطأ بسبب عدم المصادقة، قد تحتاج لعرض LoginPopup هنا
+      // setShowLoginPopup(true); // مثال: إذا كان الـ API يعيد 401
     }
   }
 
   const isInWishlist = (productId) => wishlistItems.some((item) => item._id === productId);
 
   const handleAddToWishlist = async (id) => {
+    // تم إزالة التحقق من تسجيل الدخول هنا
     try {
       if (isInWishlist(id)) {
         const { data } = await deletWhichData(id);
-        if (data.message === "success") toast.success("تم الإزالة");
+        if (data.message === "success") {
+          toast.success("تم الإزالة من المفضلة", {
+            position: "top-center",
+            className: "border border-danger p-3 bg-white text-danger",
+            duration: 1000,
+            icon: "🗑️",
+          });
+        }
       } else {
         const { data } = await addWishlist(id);
-        if (data.message === "success") toast.success("تم الإضافة");
+        if (data.message === "success") {
+          toast.success("تم الإضافة إلى المفضلة", {
+            position: "top-center",
+            className: "border border-success p-3 bg-white text-success",
+            duration: 1000,
+            icon: "❤️",
+          });
+        }
       }
       fetchWishlist();
     } catch (error) {
       console.error("Error updating wishlist:", error);
+      // إذا كان الخطأ بسبب عدم المصادقة، قد تحتاج لعرض LoginPopup هنا
+      if (error.response?.status === 401) { // مثال: التحقق من رمز حالة HTTP
+        toast.error("يرجى تسجيل الدخول أولاً لإدارة قائمة المفضلة.", { duration: 2000 });
+        // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
+      } else {
+        toast.error("حدث خطأ أثناء تحديث قائمة المفضلة.");
+      }
     }
   };
 
   const handleAddToCart = async (productId, selectedImageUrl, count) => {
+    // تم إزالة التحقق من تسجيل الدخول هنا
     try {
       let { data } = await addCart(productId, selectedImageUrl, count);
       if (data.message === "success") {
         setCartCount(data.cartItems);
-        toast.success("تم الاضافه");
+        toast.success("تمت الإضافة إلى السلة", {
+          position: "top-center",
+          className: "border border-success p-3 bg-white text-success",
+          duration: 1000,
+          icon: "�",
+        });
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
+      // إذا كان الخطأ بسبب عدم المصادقة، قد تحتاج لعرض LoginPopup هنا
+      if (error.response?.status === 401) { // مثال: التحقق من رمز حالة HTTP
+        toast.error("يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة.", { duration: 2000 });
+        // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
+      } else {
+        toast.error("حدث خطأ أثناء الإضافة إلى السلة", {
+          position: "top-center",
+          className: "border border-danger p-3 bg-white text-danger",
+          duration: 1000,
+          icon: "❌",
+        });
+      }
     }
   };
 
@@ -125,6 +187,7 @@ export default function ProductDetail() {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    // تم إزالة التحقق من تسجيل الدخول هنا
     if (!reviewText.trim()) return toast.error('من فضلك اكتب تعليق للتقييم.');
     setLoadingReview(true);
     try {
@@ -139,9 +202,14 @@ export default function ProductDetail() {
     } catch (error) {
       if (error.response?.data?.error === 'You have already created a review before') {
         toast.error("لقد قمت بإضافة تقييم لهذا المنتج من قبل.");
-      } else {
-        toast.error('حدث خطأ أثناء إضافة التقييم. حاول مرة أخرى.');
+      } else if (error.response?.status === 401) { // مثال: التحقق من رمز حالة HTTP
+        toast.error("يرجى تسجيل الدخول أولاً لإضافة تقييم.", { duration: 2000 });
+        // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
       }
+      else {
+        toast.error(error.response?.data?.message || 'حدث خطأ أثناء إضافة التقييم. حاول مرة أخرى.');
+      }
+      console.error("Error submitting review:", error);
     } finally {
       setLoadingReview(false);
     }
@@ -160,13 +228,19 @@ export default function ProductDetail() {
     );
   };
 
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ar-EG');
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString('ar-EG');
+    } catch (e) {
+      console.error("Invalid date string:", dateString);
+      return dateString;
+    }
+  };
 
-  if (!product) return <div>جار التحميل...</div>;
-
-
-  console.log("sads",product.AllReview);
-  
+  // Display Loader component while product data is being fetched
+  if (loadingProduct || !product) {
+    return <Loader />;
+  }
 
   return (
     <div className="product-detail-page-container" dir="rtl">
@@ -191,9 +265,8 @@ export default function ProductDetail() {
             {/* Main product image using Swiper */}
             <Swiper
               spaceBetween={10}
-              // Removed navigation={true} to hide arrows
               thumbs={{ swiper: thumbsSwiper }}
-              modules={[FreeMode, Thumbs]} // Removed Navigation module as arrows are not needed
+              modules={[FreeMode, Thumbs]}
               className="mySwiper2"
               onSlideChange={(swiper) => setActiveSlideIndex(swiper.activeIndex)}
               initialSlide={activeSlideIndex}
@@ -212,55 +285,55 @@ export default function ProductDetail() {
 
           <div className="thumbnail-gallery-wrapper">
             {/* Thumbnail images using Swiper */}
-           <Swiper
-  onSwiper={setThumbsSwiper}
-  spaceBetween={10}
-  slidesPerView={Math.min(4, product.images.length)} // تأخذ القيمة الأقل بين 4 وعدد الصور
-  freeMode={true}
-  watchSlidesProgress={true}
-  modules={[FreeMode, Navigation, Thumbs]}
-  className="mySwiper"
-  navigation={{
-    nextEl: '.swiper-button-next-custom',
-    prevEl: '.swiper-button-prev-custom',
-  }}
-  breakpoints={{
-    0: {
-      slidesPerView: Math.min(4, product.images.length),
-      spaceBetween: 5,
-    },
-    576: {
-      slidesPerView: Math.min(4, product.images.length),
-      spaceBetween: 10,
-    },
-    768: {
-      slidesPerView: Math.min(5, product.images.length),
-      spaceBetween: 10,
-    },
-  }}
->
-  {product.images.map((img, index) => (
-    <SwiperSlide
-      key={index}
-      onClick={() => {
-        if (thumbsSwiper) {
-          thumbsSwiper.slideTo(index);
-        }
-      }}
-      className={index === activeSlideIndex ? 'swiper-slide-thumb-active' : ''}
-    >
-      <img
-        src={img}
-        alt={`${product.title} thumb ${index + 1}`}
-        className="thumbnail-image"
-      />
-    </SwiperSlide>
-  ))}
-</Swiper>
+            <Swiper
+              onSwiper={setThumbsSwiper}
+              spaceBetween={10}
+              slidesPerView={Math.min(4, product.images.length)}
+              freeMode={true}
+              watchSlidesProgress={true}
+              modules={[FreeMode, Navigation, Thumbs]}
+              className="mySwiper"
+              navigation={{
+                nextEl: '.swiper-button-next-custom',
+                prevEl: '.swiper-button-prev-custom',
+              }}
+              breakpoints={{
+                0: {
+                  slidesPerView: Math.min(4, product.images.length),
+                  spaceBetween: 5,
+                },
+                576: {
+                  slidesPerView: Math.min(4, product.images.length),
+                  spaceBetween: 10,
+                },
+                768: {
+                  slidesPerView: Math.min(5, product.images.length),
+                  spaceBetween: 10,
+                },
+              }}
+            >
+              {product.images.map((img, index) => (
+                <SwiperSlide
+                  key={index}
+                  onClick={() => {
+                    if (thumbsSwiper) {
+                      thumbsSwiper.slideTo(index);
+                    }
+                  }}
+                  className={index === activeSlideIndex ? 'swiper-slide-thumb-active' : ''}
+                >
+                  <img
+                    src={img}
+                    alt={`${product.title} thumb ${index + 1}`}
+                    className="thumbnail-image"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
             {/* Custom navigation buttons for thumbnails - Moved BELOW the Swiper */}
-            <div className="swiper-thumbnail-navigation-buttons"> {/* New wrapper for flex positioning */}
-                <div className="swiper-button-prev-custom"></div>
-                <div className="swiper-button-next-custom"></div>
+            <div className="swiper-thumbnail-navigation-buttons">
+              <div className="swiper-button-prev-custom"></div>
+              <div className="swiper-button-next-custom"></div>
             </div>
           </div>
         </div>
@@ -294,26 +367,26 @@ export default function ProductDetail() {
 
           <div className="product-meta-details">
             {product.sizes && product.sizes.length > 0 && (
-                <div className="meta-item">
-                    <span className="meta-label">الحجم</span>
-                    <div className="type-options">
-                        {product.sizes.map((size, index) => (
-                            <button key={index} className="type-option">
-                                {size}
-                            </button>
-                        ))}
-                    </div>
+              <div className="meta-item">
+                <span className="meta-label">الحجم</span>
+                <div className="type-options">
+                  {product.sizes.map((size, index) => (
+                    <button key={index} className="type-option">
+                      {size}
+                    </button>
+                  ))}
                 </div>
+              </div>
             )}
             {product.colors && product.colors.length > 0 && (
-                <div className="meta-item">
-                    <span className="meta-label">اللون</span>
-                    <div className="color-options">
-                        {product.colors.map((color, index) => (
-                            <span key={index} className="color-option" style={{ backgroundColor: color }}></span>
-                        ))}
-                    </div>
+              <div className="meta-item">
+                <span className="meta-label">اللون</span>
+                <div className="color-options">
+                  {product.colors.map((color, index) => (
+                    <span key={index} className="color-option" style={{ backgroundColor: color }}></span>
+                  ))}
                 </div>
+              </div>
             )}
             <div className="meta-item">
 
@@ -322,37 +395,37 @@ export default function ProductDetail() {
 
           </div>
 
-<div className="action-buttons">
- <div className='d-flex justify-content-between align-items-center'>
-   <div className="quantity-control ">
-    <button className="quantity-btn" onClick={increaseCount}>+</button>
-    <span className="quantity-display">{count}</span>
-    <button className="quantity-btn" onClick={decreaseCount}>-</button>
-  </div>
+          <div className="action-buttons">
+            <div className='d-flex justify-content-between align-items-center'>
+              <div className="quantity-control ">
+                <button className="quantity-btn" onClick={increaseCount}>+</button>
+                <span className="quantity-display">{count}</span>
+                <button className="quantity-btn" onClick={decreaseCount}>-</button>
+              </div>
 
 
-  <div className="wishlist-button-container mx-2">
-    <span className="cursor-pointer" onClick={() => handleAddToWishlist(product._id)}>
-      {isInWishlist(product._id) ? (
-        <FaHeart className="fs-4 text-danger wishlist-icon" />
-      ) : (
-        <FaRegHeart className="fs-4 text-white wishlist-icon" />
-      )}
-    </span>
- 
-
-  </div>
- </div>
+              <div className="wishlist-button-container mx-2">
+                <span className="cursor-pointer" onClick={() => handleAddToWishlist(product._id)}>
+                  {isInWishlist(product._id) ? (
+                    <FaHeart className="fs-4 text-danger wishlist-icon" />
+                  ) : (
+                    <FaRegHeart className="fs-4 text-white wishlist-icon" />
+                  )}
+                </span>
 
 
-<button className="btn add-to-bag-btn x-2 w-100" onClick={() => handleAddToCart(product._id, product.images[activeSlideIndex], count)}>
-    <BsCartCheckFill className='mx-2'/>
-    أضف إلى السلة
-  </button>
-</div>
+              </div>
+            </div>
+
+
+            <button className="btn add-to-bag-btn x-2 w-100" onClick={() => handleAddToCart(product._id, product.images[activeSlideIndex], count)}>
+              <BsCartCheckFill className='mx-2' />
+              أضف إلى السلة
+            </button>
+          </div>
         </div>
       </div>
-  
+
 
       {/* Description & Add Comment Tabs Section */}
       <div className="product-info-tabs-section">
@@ -412,7 +485,7 @@ export default function ProductDetail() {
 
         {/* Report Product Link */}
         <div className="report-product-link disabled">
-            <i className="fas fa-flag ms-2 "></i> الإبلاغ عن المنتج
+          <i className="fas fa-flag ms-2 "></i> الإبلاغ عن المنتج
         </div>
       </div>
 
@@ -423,9 +496,9 @@ export default function ProductDetail() {
         <div className="reviews-summary-column ">
           <h2 className="reviews-title">المراجعات</h2>
           <div className="overall-rating">
-            <span className="overall-rating-value">{product.rateAvg?.toFixed(1)||0}/5</span>
+            <span className="overall-rating-value">{product.rateAvg?.toFixed(1) || 0}/5</span>
             <div className="overall-stars">
-                {renderStars(product.rateAvg)}
+              {renderStars(product.rateAvg)}
             </div>
             <span className="overall-reviews-count">{product.rateCount} مراجعات</span>
           </div>
@@ -452,6 +525,7 @@ export default function ProductDetail() {
         </div>
 
         <div className="individual-reviews-column ">
+          {/* هنا يتم عرض التعليقات. تأكد أن product.AllReview يتم تحديثه بشكل صحيح */}
           {product.AllReview && product.AllReview.length ? product.AllReview.map((review) => (
             <div key={review._id} className="review-item ">
               <div className="review-header">
@@ -472,90 +546,91 @@ export default function ProductDetail() {
       </div>
 
 
+      <div className="related-products-section">
+        <h2 className="section-title">منتجات ذات صلة</h2>
 
-      
-<div className="related-products-section">
-  <h2 className="section-title">منتجات ذات صلة</h2>
-  
-  {similarProducts.length > 0 ? (
-    <div className="swiper-container">
-      <Swiper
-        modules={[Navigation]}
-        spaceBetween={15}
-        slidesPerView={2}
-        navigation={{
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        }}
-         pagination={{ // إضافة إعدادات النقاط
-    clickable: true, // يجعل النقاط قابلة للنقر
-    el: '.swiper-pagination', // العنصر الذي ستظهر فيه النقاط
-  }}
-        breakpoints={{
-          640: {
-            slidesPerView: 2,
-            spaceBetween: 20
-          },
-          768: {
-            slidesPerView: 3,
-            spaceBetween: 25
-          },
-          1024: {
-            slidesPerView: 4,
-            spaceBetween: 30
-          },
-        }}
-        className="related-products-swiper"
-      >
-        {similarProducts.map(p => (
-          <SwiperSlide key={p._id}>
-            <div 
-              className="related-product-card"
-              onClick={() => navigate(`/productDetel/${p._id}`)}
+        {similarProducts.length > 0 ? (
+          <div className="swiper-container">
+            <Swiper
+              modules={[Navigation]}
+              spaceBetween={15}
+              slidesPerView={2}
+              navigation={{
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+              }}
+              pagination={{
+                clickable: true,
+                el: '.swiper-pagination',
+              }}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20
+                },
+                768: {
+                  slidesPerView: 3,
+                  spaceBetween: 25
+                },
+                1024: {
+                  slidesPerView: 4,
+                  spaceBetween: 30
+                },
+              }}
+              className="related-products-swiper"
             >
-              <div className="product-image-container">
-                <AiOutlineEye className="view-icon" />
-                <img
-                  src={p.images[0]}
-                  alt={p.title}
-                  className="product-image"
-                />
-              </div>
-              
-              <div className="product-info  mx-2">
-                <h3 className="product-brand fs-4">{p.title.split(" ").slice(0, 3).join(" ") || 'VOLUMINA'}</h3>
-                <h4 className="product-title fs-6">{p.description.split(" ").slice(0, 2).join(" ")}</h4>
-                
-                <div className="price-section">
-                  {p.proceAfterDiscount && p.proceAfterDiscount < p.price ? (
-                    <>
-                      <span className="discounted-price text">${p.proceAfterDiscount?.toFixed(2)}</span>
-                      <span className="original-price">${p.price?.toFixed(2)}</span>
-                    </>
-                  ) : (
-                    <span className="current-price">${p.price?.toFixed(2)}</span>
-                  )}
-                </div>
-                
-                <div className="rating-section">
-                  <div className="stars">
-                    {renderStars(p.rateAvg || 0)}
+              {similarProducts.map(p => (
+                <SwiperSlide key={p._id}>
+                  <div
+                    className="related-product-card"
+                    onClick={() => navigate(`/productDetel/${p._id}`)}
+                  >
+                    <div className="product-image-container">
+                      <AiOutlineEye className="view-icon" />
+                      <img
+                        src={p.images[0]}
+                        alt={p.title}
+                        className="product-image"
+                      />
+                    </div>
+
+                    <div className="product-info  mx-2">
+                      <h3 className="product-brand fs-4">{p.title.split(" ").slice(0, 3).join(" ") || 'VOLUMINA'}</h3>
+                      <h4 className="product-title fs-6">{p.description.split(" ").slice(0, 2).join(" ")}</h4>
+
+                      <div className="price-section">
+                        {p.proceAfterDiscount && p.proceAfterDiscount < p.price ? (
+                          <>
+                            <span className="discounted-price text">${p.proceAfterDiscount?.toFixed(2)}</span>
+                            <span className="original-price">${p.price?.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span className="current-price">${p.price?.toFixed(2)}</span>
+                        )}
+                      </div>
+
+                      <div className="rating-section">
+                        <div className="stars">
+                          {renderStars(p.rateAvg || 0)}
+                        </div>
+                        <span className="rating-value">({p.rateCount || 0})</span>
+                      </div>
+                    </div>
                   </div>
-                  <span className="rating-value">({p.rateCount || 0})</span>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-      
-      <div className="swiper-button-prev"></div>
-      <div className="swiper-button-next"></div>
-    </div>
-  ) : (
-    <p className="no-products-message">لا توجد منتجات مشابهة متاحة.</p>
-  )}
-</div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            <div className="swiper-button-prev"></div>
+            <div className="swiper-button-next"></div>
+          </div>
+        ) : (
+          <p className="no-products-message">لا توجد منتجات مشابهة متاحة.</p>
+        )}
+      </div>
+
+      {/* <--- تم إزالة تضمين الـ Login Pop-up هنا ---> */}
+      {/* {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />} */}
     </div>
   );
 }
