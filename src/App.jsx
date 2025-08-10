@@ -81,7 +81,6 @@ function AppContent() {
       try {
         const data = jwtDecode(token);
         savedata(data);
-        console.log("✅ User Data Loaded:", data);
       } catch (err) {
         console.error("❌ فشل في قراءة التوكن:", err);
       }

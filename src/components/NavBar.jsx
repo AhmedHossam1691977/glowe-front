@@ -18,7 +18,7 @@ import { AuthContext } from '../context/AuthContext.jsx';
 export default function NavBar({ userdata }) {
     const { userName } = useContext(AuthContext);
    
-    console.log('userName in NavBar:', userName);
+  
     
     const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
     // New state for user account offcanvas

@@ -98,22 +98,13 @@ export default function TopRatedProducts() {
             if (isInWishlist(id)) {
                 const { data } = await deletWhichData(id);
                 if (data.message === "success") {
-                    toast.success("تم الإزالة من المفضلة", {
-                        position: "top-center",
-                        className: "border border-danger p-3 bg-white text-danger",
-                        duration: 1000,
-                        icon: "🗑️",
-                    });
+                    toast.success("تم الإزالة من المفضلة", { duration: 1000 });
                 }
             } else {
                 const { data } = await addWishlist(id);
                 if (data.message === "success") {
-                    toast.success("تم الإضافة إلى المفضلة", {
-                        position: "top-center",
-                        className: "border border-success p-3 bg-white text-success",
-                        duration: 1000,
-                        icon: "❤️",
-                    });
+                                   toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
+
                 }
             }
             fetchWishlist();
@@ -140,21 +131,12 @@ export default function TopRatedProducts() {
 
             if (data.message === "success") {
                 setCartCount(data.cartItems);
-                toast.success("تمت الإضافة إلى السلة", {
-                    position: "top-center",
-                    className: "border border-success p-3 bg-white text-success",
-                    duration: 1000,
-                    icon: "🛒",
-                });
+                toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
             }
         } catch (error) {
             console.error("Error adding to cart:", error);
-            toast.error("حدث خطأ أثناء الإضافة إلى السلة", {
-                position: "top-center",
-                className: "border border-danger p-3 bg-white text-danger",
-                duration: 1000,
-                icon: "❌",
-            });
+                       toast.error("حدث خطأ أثناء الإضافة إلى السلة");
+
         }
     }
 

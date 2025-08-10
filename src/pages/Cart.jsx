@@ -69,9 +69,9 @@ export default function Cart() {
         setCartId(null);
 
         if (!hasShownEmptyCartToast.current) {
-          toast.error("ليس لديك أي منتجات في عربة التسوق بعد.", {
+          toast.error("لا يوجد منتجات هنا ", {
             position: 'top-center',
-            className: 'border border-danger notefection p-3 bg-white text-danger w-100 fw-bolder fs-4',
+            className: 'border border-danger notefection p-1 bg-white text-danger fw-bolder fs-4',
             duration: 800,
           });
           hasShownEmptyCartToast.current = true;
@@ -86,11 +86,11 @@ export default function Cart() {
       setCartId(null);
 
       if (!hasShownEmptyCartToast.current) {
-        toast.error("ليس لديك أي منتجات في عربة التسوق بعد.", {
-          position: 'top-center',
-          className: 'border border-danger notefection p-3 bg-white text-danger w-100 fw-bolder fs-4',
-          duration: 800,
-        });
+        toast.error("لا يوجد منتجات هنا ", {
+            position: 'top-center',
+            className: 'border border-danger notefection p-1 bg-white text-danger fw-bolder fs-4',
+            duration: 800,
+          });
         hasShownEmptyCartToast.current = true;
       }
     }
@@ -112,7 +112,6 @@ export default function Cart() {
       } catch (error) {
         console.error("Error deleting product:", error);
         toast.error("حدث خطأ أثناء حذف المنتج.", {
-          position: 'bottom-right',
           className: 'border border-danger p-3 bg-white text-danger fw-bolder notefection fs-4',
           duration: 800,
         });
@@ -133,7 +132,7 @@ export default function Cart() {
         });
 
         toast.success("تم تحديث الكمية بنجاح", {
-          position: 'bottom-right',
+
           className: 'border border-success p-3 bg-white text-success fw-bolder notefection fs-5',
           duration: 800,
         });
@@ -141,7 +140,6 @@ export default function Cart() {
     } catch (error) {
       console.error("Error updating quantity:", error);
       toast.error("حدث خطأ أثناء تحديث الكمية.", {
-        position: 'bottom-right',
         className: 'border border-danger p-3 bg-white text-danger fw-bolder notefection fs-4',
         duration: 800,
       });

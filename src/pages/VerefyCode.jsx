@@ -13,7 +13,7 @@ export default function VerefyCode() { // New component name
   const validationSchema = Yup.object({
     code: Yup.string()
       .required("الكود مطلوب")
-      .matches(/^\d{6}$/, "الكود يجب أن يكون 6 أرقام"), // Validation for a 6-digit code
+      .matches(/^\d{5}$/, "الكود يجب أن يكون 6 أرقام"), // Validation for a 6-digit code
   });
 
   const verifyCodeForm = useFormik({

@@ -152,35 +152,36 @@ export default function ProductDetail() {
     }
   };
 
-  const handleAddToCart = async (productId, selectedImageUrl, count) => {
-    // تم إزالة التحقق من تسجيل الدخول هنا
-    try {
-      let { data } = await addCart(productId, selectedImageUrl, count);
-      if (data.message === "success") {
-        setCartCount(data.cartItems);
-        toast.success("تمت الإضافة إلى السلة", {
-          position: "top-center",
-          className: "border border-success p-3 bg-white text-success",
-          duration: 1000,
-          icon: "�",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      // إذا كان الخطأ بسبب عدم المصادقة، قد تحتاج لعرض LoginPopup هنا
-      if (error.response?.status === 401) { // مثال: التحقق من رمز حالة HTTP
-        toast.error("يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة.", { duration: 2000 });
-        // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
-      } else {
-        toast.error("حدث خطأ أثناء الإضافة إلى السلة", {
-          position: "top-center",
-          className: "border border-danger p-3 bg-white text-danger",
-          duration: 1000,
-          icon: "❌",
-        });
-      }
+const handleAddToCart = async (productId, selectedImageUrl, count) => {
+  try {
+    const { data } = await addCart(productId, selectedImageUrl, count);
+
+    if (data.message === "success") {
+      setCartCount(data.cartItems || 0);
+
+        toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
+      
     }
-  };
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+
+    if (error.response?.status === 401) {
+      toast.error("⚠️ يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة.", {
+        position: "top-center",
+        className: "border border-warning p-3 bg-white text-warning",
+        duration: 2000,
+      });
+      // مثال: عرض نافذة تسجيل الدخول
+      // setShowLoginPopup(true);
+    } else {
+      toast.error("❌ حدث خطأ أثناء الإضافة إلى السلة", {
+        position: "top-center",
+        className: "border border-danger p-3 bg-white text-danger",
+        duration: 1500,
+      });
+    }
+  }
+};
 
   const increaseCount = () => setCount(prev => prev + 1);
   const decreaseCount = () => count > 1 && setCount(prev => prev - 1);

@@ -22,7 +22,9 @@ export default function CatigoryContextProvider(props){
 
         const {data} = await axios.get(`${baseUrl}/api/v1/categories`).catch((err)=>{
             console.log(err);
+
         })
+console.log("data", data);
 
         setAllCatigory(data.categories)
         

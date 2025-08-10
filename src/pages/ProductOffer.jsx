@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import image from "./../assets/silver-crystal-branch-with-plate-makeup-brushes-lipstick-white-background_23-2148129421.avif";
 import "./../style/procust.css";
 import { Link, useLocation } from "react-router-dom";
@@ -10,33 +10,26 @@ import { BsCartCheckFill } from "react-icons/bs";
 import { AiOutlineEye } from "react-icons/ai";
 import { CartContext } from "../context/CartContext.jsx";
 import { productContext } from "../context/Product.Contextt.jsx";
-// استيراد Swiper والمكونات الأساسية
 import { Swiper, SwiperSlide } from 'swiper/react';
-// استيراد وحدات Swiper المطلوبة (مثل Pagination، Navigation)
 import { Pagination, Navigation } from 'swiper/modules';
-
-// استيراد أنماط Swiper الأساسية ووحدات الـ CSS
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-
-// import LoginPopup from './LoginPopup.jsx'; // <--- تم إزالة استيراد LoginPopup
-
+import { Circles } from 'react-loader-spinner'; // استيراد مؤشر التحميل
 
 export default function ProductOffer() {
     const [activeSort, setActiveSort] = useState("title");
-    const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [products, setProducts] = useState([]); // المنتجات الأصلية التي تم جلبها من الـ API
+    const [filteredProducts, setFilteredProducts] = useState([]); // المنتجات بعد تطبيق الفلاتر والبحث
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [wishlistItems, setWishlistItems] = useState([]);
     const [activeSlideIndices, setActiveSlideIndices] = useState({});
+    const [loading, setLoading] = useState(true); // حالة التحميل
 
-    // <--- استبدال AuthContext بحالة محلية للتحقق من تسجيل الدخول --->
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    // const [showLoginPopup, setShowLoginPopup] = useState(false); // <--- تم إزالة هذه الحالة
 
-    const basUrl = "https://final-pro-api-j1v7.onrender.com";
+    const basUrl = "https://final-pro-api-j1v7.onrender.com"; // تأكد من صحة هذا الـ URL
     const { product: searchTerm } = useContext(productContext);
     const {
         addWishlist,
@@ -54,11 +47,16 @@ export default function ProductOffer() {
     const checkLoginStatus = () => {
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
-    }
+    };
 
     useEffect(() => {
         checkLoginStatus(); // تحقق من حالة تسجيل الدخول عند تحميل المكون
-    }, []); // تشغيل مرة واحدة عند التحميل الأولي
+        // الاستماع لتغييرات localStorage (مثل تسجيل الدخول/الخروج في نافذة أخرى)
+        window.addEventListener('storage', checkLoginStatus);
+        return () => {
+            window.removeEventListener('storage', checkLoginStatus);
+        };
+    }, []);
 
     const sortOptions = [
         { label: "الاسم", value: "title" },
@@ -67,33 +65,9 @@ export default function ProductOffer() {
         { label: "السعر", value: "price" },
     ];
 
-    useEffect(() => {
-        allProducts();
-    }, [activeSort, minPrice, maxPrice]);
-
-    useEffect(() => {
-        // فقط جلب قائمة الأمنيات إذا كان المستخدم مسجلاً للدخول
-        if (isLoggedIn) {
-            fetchWishlist();
-        } else {
-            setWishlistItems([]); // مسح قائمة الأمنيات إذا لم يكن المستخدم مسجلاً للدخول
-        }
-    }, [isLoggedIn]); // أضف isLoggedIn كـ dependency لجلب قائمة الأمنيات عند تغيير حالة الدخول
-
-
-    useEffect(() => {
-        if (searchTerm) {
-            const filtered = products.filter(product =>
-                product.title.includes(searchTerm) ||
-                product.description.includes(searchTerm)
-            );
-            setFilteredProducts(filtered);
-        } else {
-            setFilteredProducts(products);
-        }
-    }, [searchTerm, products]);
-
-    async function allProducts() {
+    // دالة جلب جميع المنتجات
+    const allProducts = useCallback(async () => {
+        setLoading(true); // بدء التحميل
         try {
             const params = new URLSearchParams();
 
@@ -106,62 +80,97 @@ export default function ProductOffer() {
                 if (maxPrice) params.append("price[lte]", maxPrice);
             }
 
+            // جلب المنتجات التي تحتوي على خصم فقط
+            params.append("priceAfterDiscount[gt]", 0);
+
             const url =
                 activeSort === "date"
-                    ? `${basUrl}/api/v1/product?sort=-createdAt`
+                    ? `${basUrl}/api/v1/product?sort=-createdAt&priceAfterDiscount[gt]=0`
                     : `${basUrl}/api/v1/product?${params.toString()}`;
 
+            console.log("Fetching offers URL:", url);
             const { data } = await axios.get(url);
-            setProducts(data.product);
-            setFilteredProducts(data.product);
+            console.log("Offers API Response:", data);
 
-            const initialActiveSlides = {};
-            data.product.forEach(p => {
-                initialActiveSlides[p._id] = 0;
-            });
-            setActiveSlideIndices(initialActiveSlides);
+            if (data.product && Array.isArray(data.product)) {
+                setProducts(data.product); // تخزين المنتجات الأصلية
+                // تهيئة activeSlideIndices
+                const initialActiveSlides = {};
+                data.product.forEach(p => {
+                    initialActiveSlides[p._id] = 0;
+                });
+                setActiveSlideIndices(initialActiveSlides);
+            } else {
+                setProducts([]);
+                toast.error("لم يتم العثور على منتجات عروض.", { duration: 3000 });
+            }
         } catch (error) {
             console.error("Error fetching products:", error);
+            setProducts([]); // مسح المنتجات في حالة وجود خطأ
+            toast.error("حدث خطأ أثناء جلب المنتجات. يرجى المحاولة لاحقاً.", { duration: 3000 });
+        } finally {
+            setLoading(false); // انتهاء التحميل
         }
-    }
+    }, [activeSort, minPrice, maxPrice, basUrl]);
+
+    // جلب المنتجات عند تغيير خيارات الفرز أو الفلترة
+    useEffect(() => {
+        allProducts();
+    }, [allProducts]); // يعتمد على allProducts التي هي useCallback
+
+    // جلب قائمة الأمنيات عند تسجيل الدخول/الخروج
+    useEffect(() => {
+        if (isLoggedIn) {
+            fetchWishlist();
+        } else {
+            setWishlistItems([]); // مسح قائمة الأمنيات إذا لم يكن المستخدم مسجلاً للدخول
+        }
+    }, [isLoggedIn]);
+
+    // تطبيق الفلترة بناءً على مصطلح البحث على المنتجات التي تم جلبها
+    useEffect(() => {
+        const currentSearchTerm = searchTerm ? String(searchTerm).toLowerCase() : '';
+
+        if (currentSearchTerm) {
+            const filtered = products.filter(product =>
+                (product.title && product.title.toLowerCase().includes(currentSearchTerm)) ||
+                (product.description && product.description.toLowerCase().includes(currentSearchTerm))
+            );
+            setFilteredProducts(filtered);
+        } else {
+            setFilteredProducts(products); // إذا لا يوجد بحث، اعرض جميع المنتجات التي تم جلبها
+        }
+    }, [searchTerm, products]); // يعتمد على searchTerm و products
 
     async function fetchWishlist() {
         try {
             const { data } = await getAllWhichlistData();
+            console.log("Fetched wishlist data:", data);
+            
             setWishlistItems(data?.wishlist || []);
         } catch (error) {
             console.error("Error fetching wishlist:", error);
+            toast.error("حدث خطأ أثناء جلب قائمة الأمنيات.");
         }
     }
 
-    async function toggleWishlist(id) {
-        // <--- التحقق من تسجيل الدخول قبل أي إجراء
+    async function toggleWishlist(prodId) {
         if (!isLoggedIn) {
             toast.error("يرجى تسجيل الدخول أولاً لإدارة قائمة المفضلة.", { duration: 2000 });
-            // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
-            return; // إيقاف تنفيذ الدالة
+            return;
         }
 
         try {
-            if (isInWishlist(id)) {
-                const { data } = await deletWhichData(id);
+            if (isInWishlist(prodId)) {
+                const { data } = await deletWhichData(prodId);
                 if (data.message === "success") {
-                    toast.success("تم الإزالة", {
-                        position: "top-center",
-                        className: "border border-danger p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
-                        duration: 1000,
-                        icon: "🗑️",
-                    });
+                   toast.success("تم الإزالة من المفضلة", { duration: 1000 });
                 }
             } else {
-                const { data } = await addWishlist(id);
+                const { data } = await addWishlist(prodId);
                 if (data.message === "success") {
-                    toast.success("تم الإضافة", {
-                        position: "top-center",
-                        className: "border border-danger notefection p-3 bg-white text-danger w-100 fw-bolder fs-4",
-                        duration: 1000,
-                        icon: "❤️",
-                    });
+                            toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
+
                 }
             }
             fetchWishlist();
@@ -173,53 +182,42 @@ export default function ProductOffer() {
 
     const isInWishlist = (productId) => wishlistItems.some((item) => item._id === productId);
 
-    async function addToChart(id, productImages, slideIndex) {
-        // <--- التحقق من تسجيل الدخول قبل أي إجراء
+    async function addToChart(prodId, productImages, slideIndex) {
         if (!isLoggedIn) {
             toast.error("يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة.", { duration: 2000 });
-            // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
-            return; // إيقاف تنفيذ الدالة
+            return;
         }
 
         try {
             const imageToUse = productImages[slideIndex];
 
-            console.log(`جارٍ إضافة المنتج ID: ${id} إلى السلة. الصورة المختارة:`, imageToUse);
+            console.log(`جارٍ إضافة المنتج ID: ${prodId} إلى السلة. الصورة المختارة:`, imageToUse);
 
-            let { data } = await addCart(id, imageToUse);
+            let { data } = await addCart(prodId, imageToUse);
             if (data.message === "success") {
                 setCartCount(data.cartItems);
-                toast.success("تم الاضافه", {
-                    position: 'top-center',
-                    className: 'border border-success notefection  p-3 bg-white text-success  fw-bolder fs- success',
-                    duration: 1000,
-                    icon: '👏'
-                });
+                 toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
             } else {
                 throw new Error("Error adding to cart");
             }
         } catch (error) {
             console.error("Error adding to cart:", error);
-            toast.error("حدث خطأ أثناء إضافة المنتج إلى السلة", {
-                position: 'top-center',
-                className: 'border border-danger notefection p-3 bg-white text-danger fw-bolder fs-4 error',
-                duration: 1000,
-                icon: '❌'
-            });
+                toast.error("حدث خطأ أثناء الإضافة إلى السلة");
+
         }
     }
 
     // إعدادات الـ Swiper لكل منتج
     const productSwiperSettings = (productId) => ({
-        modules: [Pagination, Navigation], // إضافة الوحدات المطلوبة
+        modules: [Pagination, Navigation],
         spaceBetween: 0,
         slidesPerView: 1,
         pagination: { clickable: true },
-        navigation: false, // يمكنك تفعيل الأسهم إذا أردت
+        navigation: false,
         onSlideChange: (swiper) => {
             setActiveSlideIndices(prev => ({
                 ...prev,
-                [productId]: swiper.activeIndex // تحديث الفهرس النشط
+                [productId]: swiper.activeIndex
             }));
         },
     });
@@ -281,118 +279,119 @@ export default function ProductOffer() {
                         </div>
                     </div>
 
-                    {searchTerm && filteredProducts.length === 0 && (
-                        <div className="alert alert-danger text-center fs-4">
-                            لا توجد منتجات تطابق بحثك: "{searchTerm}"
+                    {/* مؤشر التحميل */}
+                    {loading && (
+                        <div className="text-center my-3">
+                            <div className="spinner-border text-danger" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="text-muted">جاري تحميل المزيد من المنتجات...</p>
                         </div>
                     )}
+                    {/* {!hasMore && !loading && filteredProducts.length > 0 && (
+                        <div className="text-center my-3 text-muted">
+                            لقد وصلت إلى نهاية قائمة المنتجات.
+                        </div>
+                    )} */}
 
-                    <div className="row">
-                        {filteredProducts
-                            .filter((product) => product.priceAfterDiscount)
-                            .map((product) => {
-                                const allProductImages = product.images && product.images.length > 0
-                                    ? [product.imgCover, ...product.images]
-                                    : [product.imgCover];
+                    {/* عرض المنتجات المفلترة */}
+                    {!loading && filteredProducts.length > 0 ? (
+                        <div className="row">
+                            {filteredProducts
+                                .filter((product) => product.priceAfterDiscount) // تأكد من عرض المنتجات التي بها خصم فقط
+                                .map((product) => {
+                                    const allProductImages = product.images && product.images.length > 0
+                                        ? [product.imgCover, ...product.images]
+                                        : [product.imgCover];
 
-                                const currentSlideIndex = activeSlideIndices[product._id] || 0;
+                                    const currentSlideIndex = activeSlideIndices[product._id] || 0;
 
-                                return (
-                                    <div key={product._id} className="col-6 col-md-6 col-lg-3 mb-4">
-                                        <div className="card product-card h-100 position-relative">
-                                            <div className="position-relative product-image-wrapper">
-                                                <Swiper {...productSwiperSettings(product._id)}>
-                                                    {allProductImages.map((imgSrc, index) => (
-                                                        <SwiperSlide key={index}>
-                                                            <img src={imgSrc} className="card-img-top product-image img-fluid" alt={`${product.title} - ${index + 1}`} />
-                                                        </SwiperSlide>
-                                                    ))}
-                                                </Swiper>
+                                    return (
+                                        <div key={product._id} className="col-6 col-md-6 col-lg-3 mb-4">
+                                            <div className="card product-card h-100 position-relative">
+                                                <div className="position-relative product-image-wrapper">
+                                                    <Swiper {...productSwiperSettings(product._id)}>
+                                                        {allProductImages.map((imgSrc, index) => (
+                                                            <SwiperSlide key={index}>
+                                                                <img src={imgSrc} className="card-img-top product-image img-fluid" alt={`${product.title} - ${index + 1}`} />
+                                                            </SwiperSlide>
+                                                        ))}
+                                                    </Swiper>
 
-                                                <div className="which-sp w-100 position-absolute top-0 start-0 p-2 d-flex flex-column align-items-start z-3">
-                                                    <span className="cursor-pointer mb-1" onClick={() => toggleWishlist(product._id)}>
-                                                        {isInWishlist(product._id) ? (
-                                                            <FaHeart className="fs-4 text-danger cursor-pointer" />
-                                                        ) : (
-                                                            <FaRegHeart className="fs-4 text-white cursor-pointer" />
-                                                        )}
-                                                    </span>
-                                                    <Link to={`/productDetel/${product._id}`}>
-                                                        <span className="cursor-pointer">
-                                                            <AiOutlineEye className="fs-4 text-white" />
+                                                    <div className="which-sp w-100 position-absolute top-0 start-0 p-2 d-flex flex-column align-items-start z-3">
+                                                        <span className="cursor-pointer mb-1" onClick={() => toggleWishlist(product._id)}>
+                                                            {isInWishlist(product._id) ? (
+                                                                <FaHeart className="fs-4 text-danger cursor-pointer" />
+                                                            ) : (
+                                                                <FaRegHeart className="fs-4 text-white cursor-pointer" />
+                                                            )}
                                                         </span>
-                                                    </Link>
-                                                </div>
+                                                        <Link to={`/productDetel/${product._id}`}>
+                                                            <span className="cursor-pointer">
+                                                                <AiOutlineEye className="fs-4 text-white" />
+                                                            </span>
+                                                        </Link>
+                                                    </div>
 
-                                                <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
-                                                    خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
-                                                </span>
-                                            </div>
-
-                                            <div className="card-body py-2">
-                                                <h6 className="card-subtitle mb-1 text-muted fs-6 fw-bold">
-                                                    {product.title?.split(" ").slice(0, 3).join(" ")}
-                                                </h6>
-
-                                                <div className="product-price mb-1 d-flex align-items-center">
-                                                    <span className="text-danger fs-6 fw-bold">
-                                                        {`${product.priceAfterDiscount} ج.م`}
-                                                    </span>
-                                                    <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
-                                                        {product.price} ج.م
-                                                    </span>
-                                                </div>
-
-                                                <div className="product-rating mb-2 fs-6 d-flex align-items-center">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <span
-                                                            key={i}
-                                                            style={{
-                                                                color: i < Math.round(product.rateAvg || 0) ? "#ffc107" : "#e4e5e9",
-                                                                fontSize: "16px",
-                                                            }}
-                                                        >
-                                                            ★
+                                                    {product.priceAfterDiscount ?
+                                                        <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
+                                                            خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
                                                         </span>
-                                                    ))}
-                                                    <span className="ms-1 text-muted fs-7">({product.rateCount || 0})</span>
+                                                        : ""}
                                                 </div>
 
-                                                <button
-                                                    onClick={() => addToChart(product._id, allProductImages, currentSlideIndex)}
-                                                    className="btn w-100 d-flex align-items-center justify-content-center gap-1 bnt-cart"
-                                                >
-                                                    <BsCartCheckFill className="fs-6" />
-                                                    <span className="text">أضف إلى السلة</span>
-                                                </button>
+                                                <div className="card-body py-2">
+                                                    <h6 className="card-subtitle mb-1 text-muted fs-6 fw-bold">
+                                                        {product.title?.split(" ").slice(0, 3).join(" ")}
+                                                    </h6>
+
+                                                    <div className="product-price mb-1 d-flex align-items-center">
+                                                        <span className="text-danger fs-6 fw-bold">
+                                                            {`${product.priceAfterDiscount} ج.م`}
+                                                        </span>
+                                                        <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
+                                                            {product.price} ج.م
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="product-rating mb-2 fs-6 d-flex align-items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <span
+                                                                key={i}
+                                                                style={{
+                                                                    color: i < Math.round(product.rateAvg || 0) ? "#ffc107" : "#e4e5e9",
+                                                                    fontSize: "16px",
+                                                                }}
+                                                            >
+                                                                ★
+                                                            </span>
+                                                        ))}
+                                                        <span className="ms-1 text-muted fs-7">({product.rateCount || 0})</span>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => addToChart(product._id, allProductImages, currentSlideIndex)}
+                                                        className="btn w-100 d-flex align-items-center justify-content-center gap-1 bnt-cart"
+                                                    >
+                                                        <BsCartCheckFill className="fs-6" />
+                                                        <span className="text">أضف إلى السلة</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                    </div>
-
-                    {filteredProducts.filter(product => product.priceAfterDiscount).length === 0 && (
-                        <div className="alert alert-info text-center fs-4">
-                            لا توجد منتجات معروضة للخصم حالياً
+                                    );
+                                })}
                         </div>
+                    ) : (
+                        // رسالة عند عدم وجود منتجات عروض على الإطلاق (بعد التحميل)
+                        !loading && filteredProducts.length === 0 && searchTerm === "" && (
+                            <div className="alert alert-info text-center fs-4">
+                                لا توجد منتجات معروضة للخصم حالياً.
+                            </div>
+                        )
                     )}
                 </div>
             </div>
-
-            {/* <--- تم إزالة تضمين الـ Login Pop-up هنا ---> */}
-            {/* {showLoginPopup && (
-                <LoginPopup
-                    onClose={() => {
-                        setShowLoginPopup(false);
-                        checkLoginStatus(); // إعادة التحقق من حالة تسجيل الدخول بعد إغلاق الـ Pop-up
-                    }}
-                    onLoginSuccess={() => {
-                        setShowLoginPopup(false);
-                        checkLoginStatus(); // تحديث حالة تسجيل الدخول بعد تسجيل الدخول بنجاح
-                    }}
-                />
-            )} */}
         </div>
     );
 }

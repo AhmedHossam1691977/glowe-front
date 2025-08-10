@@ -17,7 +17,8 @@ export default function ResetPassword() { // New component for setting the new p
       .required("البريد الإلكتروني مطلوب"),
     newPassword: Yup.string()
       .required("كلمة المرور الجديدة مطلوبة")
-      .matches(/^[a-zA-Z0-9]{6,}$/, "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل، وتشمل أحرفًا وأرقامًا"),
+     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/, "كلمة المرور يجب أن تكون 6 أحرف على الأقل و تحتوي علي احرف كبيره و علامه علي الاقل "),
+  
     confirmPassword: Yup.string()
       .required("تأكيد كلمة المرور مطلوب")
       .oneOf([Yup.ref("newPassword")], "كلمتا المرور غير متطابقتين"),

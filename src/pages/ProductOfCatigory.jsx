@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import "./../style/product-of-subcategory.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -14,7 +14,8 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import axios from "axios";
 import { productContext } from "../context/Product.Contextt.jsx";
-// import LoginPopup from './LoginPopup.jsx'; // <--- تم إزالة استيراد LoginPopup
+import { Circles } from 'react-loader-spinner'; // استيراد مؤشر التحميل
+import Loader from "../components/Loader.jsx"; // استيراد مكون التحميل
 
 export default function ProductOfCatigory() {
     const { pathname } = useLocation();
@@ -22,19 +23,25 @@ export default function ProductOfCatigory() {
         window.scrollTo(0, 0);
     }, [pathname]);
 
-    const { id } = useParams();
-    const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const { id } = useParams(); // معرف الفئة
+    const [products, setProducts] = useState([]); // جميع المنتجات المحملة
+    const [filteredProducts, setFilteredProducts] = useState([]); // المنتجات بعد تطبيق الفلاتر والبحث
 
     const [wishlistItems, setWishlistItems] = useState([]);
     const [activeSlideIndices, setActiveSlideIndices] = useState({});
-    const [activeSort, setActiveSort] = useState("title");
+    const [activeSort, setActiveSort] = useState("title"); // خيار الفرز النشط
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
-    const [subCatigoryOfCatigory, setSubCatigoryOfCatigory] = useState("");
+    const [subCatigoryOfCatigory, setSubCatigoryOfCatigory] = useState([]); // لتخزين الأقسام الفرعية
+
+    // --- Pagination States ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true); // هل توجد صفحات إضافية للتحميل؟
+    const [loading, setLoading] = useState(false); // هل يتم التحميل حالياً؟
+    // --- End Pagination States ---
 
     const baseUrl = "https://final-pro-api-j1v7.onrender.com";
-    const { product: searchTerm } = useContext(productContext);
+    const { product: searchTerm } = useContext(productContext); // مصطلح البحث من الـ Context
 
     const {
         addWishlist,
@@ -43,27 +50,22 @@ export default function ProductOfCatigory() {
     } = useContext(whichlistContext);
     const { addCart, setCartCount } = useContext(CartContext);
 
-    // --- Start: Replaced AuthContext with local state and function ---
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // <--- حالة تسجيل الدخول المحلية
-    // const [showLoginPopup, setShowLoginPopup] = useState(false); // <--- تم إزالة هذه الحالة
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // دالة للتحقق من وجود التوكن في localStorage
+    // دالة للتحقق من حالة تسجيل الدخول
     const checkLoginStatus = () => {
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
     };
 
-    // تحقق من حالة تسجيل الدخول عند تحميل المكون
+    // التحقق من حالة تسجيل الدخول عند تحميل المكون
     useEffect(() => {
         checkLoginStatus();
-        // أضف مستمعًا لحدث localStorage لتحديث حالة تسجيل الدخول إذا تغيرت في مكان آخر
         window.addEventListener('storage', checkLoginStatus);
         return () => {
             window.removeEventListener('storage', checkLoginStatus);
         };
     }, []);
-    // --- End: Replaced AuthContext with local state and function ---
-
 
     const sortOptions = [
         { label: "الاسم", value: "title" },
@@ -72,44 +74,129 @@ export default function ProductOfCatigory() {
         { label: "السعر", value: "price" },
     ];
 
-    async function getSubCatigory() {
-        try {
-            let { data } = await axios.get(`${baseUrl}/api/v1/categories/${id}`).catch((err) => {
-                console.log(err);
-            });
-            setSubCatigoryOfCatigory(data.category.allSubCatigory);
-            console.log(data.products);
-            setProducts(data.products);
-            setFilteredProducts(data.products);
+    // دالة جلب المنتجات الرئيسية (تم تعديلها لتشمل Pagination)
+    const fetchProducts = useCallback(async (page) => {
+        // إذا لم يكن هناك ID للفئة أو كان التحميل جاريًا أو لا يوجد المزيد من البيانات، أوقف التنفيذ
+        if (!id || loading || !hasMore) {
+            console.log("Stopping fetch: id missing, loading, or no more data.");
+            return;
+        }
 
+        setLoading(true); // بدء التحميل
+        try {
+            const params = new URLSearchParams();
+            if (activeSort && activeSort !== "date") {
+                params.append("sort", activeSort);
+            }
+            if (activeSort === "price") {
+                if (minPrice) params.append("price[gte]", minPrice);
+                if (maxPrice) params.append("price[lte]", maxPrice);
+            }
+            params.append("page", page);
+            params.append("limit", 8); // عدد المنتجات لكل صفحة (مهم للتحميل اللانهائي)
+
+            const url = `${baseUrl}/api/v1/categories/${id}?${params.toString()}`;
+            console.log("Fetching URL:", url);
+
+            const { data } = await axios.get(url);
+            console.log("API Response:", data);
+
+            // تأكد من أن الاستجابة تحتوي على المنتجات
+            if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+                setProducts(prevProducts => {
+                    const newProducts = [...prevProducts, ...data.products];
+                    // إزالة التكرارات بناءً على _id لضمان عدم تكرار المنتجات
+                    const uniqueProducts = Array.from(new Map(newProducts.map(obj => [obj._id, obj])).values());
+                    return uniqueProducts;
+                });
+                setCurrentPage(page);
+                // إذا كان عدد المنتجات التي تم إرجاعها أقل من الحد الأقصى (limit)، فهذا يعني لا يوجد المزيد من الصفحات
+                if (data.products.length < 8) {
+                    setHasMore(false);
+                    console.log("No more products to load.");
+                } else {
+                    setHasMore(true); // لا يزال هناك المزيد إذا تم إرجاع عدد كامل
+                }
+            } else {
+                setHasMore(false); // لا توجد منتجات أخرى لتحميلها
+                console.log("No products returned or end of data.");
+                if (page === 1) { // إذا كانت هذه هي الصفحة الأولى ولا توجد منتجات
+                    setProducts([]); // تأكد من أن قائمة المنتجات فارغة
+                }
+            }
+
+            // جلب الأقسام الفرعية مرة واحدة فقط عند تحميل الصفحة الأولى
+            if (page === 1 && data.category?.allSubCatigory) {
+                setSubCatigoryOfCatigory(data.category.allSubCatigory);
+            }
+
+            // تهيئة activeSlideIndices للمنتجات الجديدة أيضًا
             const initialActiveSlides = {};
-            data.products.forEach(p => {
+            (data.products || []).forEach(p => {
                 initialActiveSlides[p._id] = 0;
             });
-            setActiveSlideIndices(initialActiveSlides);
+            setActiveSlideIndices(prev => ({ ...prev, ...initialActiveSlides }));
+
         } catch (error) {
-            console.error("Error fetching subcategory products:", error);
+            console.error("Error fetching products:", error);
+            setHasMore(false); // إيقاف محاولة الجلب إذا حدث خطأ
+            setProducts([]); // مسح المنتجات في حالة وجود خطأ
+            if (page === 1) { // إذا حدث خطأ في أول جلب، لا توجد منتجات
+                setFilteredProducts([]);
+            }
+            toast.error("حدث خطأ أثناء جلب المنتجات. يرجى المحاولة لاحقاً.", { duration: 3000 });
+        } finally {
+            setLoading(false); // انتهاء التحميل
         }
-    }
+    }, [id, activeSort, minPrice, maxPrice, hasMore, loading, baseUrl]); // dependencies for useCallback
 
+    // هذا الـ useEffect مسؤول عن بدء الجلب الأول أو إعادة الجلب عند تغيير الفئة أو خيارات الفرز/الفلترة
     useEffect(() => {
-        getSubCatigory();
-    }, [id]);
+        // إعادة تعيين جميع حالات Pagination و Products عند تغيير id أو خيارات الفرز/الفلترة
+        setProducts([]);
+        setFilteredProducts([]);
+        setCurrentPage(1);
+        setHasMore(true);
+        setLoading(false); // تأكد من إعادة تعيين حالة التحميل
+        fetchProducts(1); // ابدأ الجلب من الصفحة الأولى
+    }, [id, activeSort, minPrice, maxPrice]); // لا تضع fetchProducts هنا، لأنها دالة useCallback وتعتمد على هذه الحالات
 
+    // Effect for search term filtering on already loaded products
     useEffect(() => {
-        // فقط جلب قائمة الأمنيات إذا كان المستخدم مسجلاً للدخول
+        const currentSearchTerm = searchTerm ? String(searchTerm).toLowerCase() : '';
+
+        let result = [...products]; // ابدأ بجميع المنتجات المحملة
+
+        if (currentSearchTerm) {
+            result = result.filter(product =>
+                (product.title && product.title.toLowerCase().includes(currentSearchTerm)) ||
+                (product.description && product.description.toLowerCase().includes(currentSearchTerm))
+            );
+        } else {
+            // إذا لم يكن هناك مصطلح بحث، طبق الفرز والفلترة العادية على جميع المنتجات المحملة
+            result = sortProducts(products, activeSort);
+            if (activeSort === "price") {
+                if (minPrice) {
+                    result = result.filter(product => product.price >= parseFloat(minPrice));
+                }
+                if (maxPrice) {
+                    result = result.filter(product => product.price <= parseFloat(maxPrice));
+                }
+            }
+        }
+        setFilteredProducts(result);
+    }, [searchTerm, products, activeSort, minPrice, maxPrice]); // إضافة dependencies needed for filtering/sorting
+
+    // جلب قائمة الأمنيات عند تسجيل الدخول/الخروج
+    useEffect(() => {
         if (isLoggedIn) {
             fetchWishlist();
         } else {
-            setWishlistItems([]); // مسح قائمة الأمنيات إذا لم يكن المستخدم مسجلاً للدخول
+            setWishlistItems([]);
         }
-    }, [isLoggedIn]); // أضف isLoggedIn كـ dependency لجلب قائمة الأمنيات عند تغيير حالة الدخول
+    }, [isLoggedIn]);
 
-    useEffect(() => {
-        filterProducts();
-    }, [activeSort, minPrice, maxPrice, searchTerm, products]);
-
-    // Lazy loading implementation
+    // Lazy loading for images (keep this as is, but ensure `filteredProducts` is the dependency)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const lazyLoadImages = () => {
@@ -131,17 +218,14 @@ export default function ProductOfCatigory() {
                         lazyImageObserver.observe(lazyImage);
                     });
                 } else {
-                    // Fallback for browsers without IntersectionObserver
                     lazyImages.forEach(function(lazyImage) {
                         lazyImage.src = lazyImage.dataset.src;
                     });
                 }
             };
 
-            // Run once on initial load
             lazyLoadImages();
 
-            // Set up mutation observer to watch for new lazy images added to DOM
             const observer = new MutationObserver(lazyLoadImages);
             observer.observe(document.body, {
                 childList: true,
@@ -158,35 +242,7 @@ export default function ProductOfCatigory() {
             setWishlistItems(data?.wishlist || []);
         } catch (error) {
             console.error("Error fetching wishlist:", error);
-            // يمكنك التعامل مع أخطاء الـ API هنا إذا كانت بسبب عدم المصادقة
         }
-    }
-
-    function filterProducts() {
-        let result = [...products];
-
-        // Apply search filter from context
-        if (searchTerm) {
-            result = result.filter(product =>
-                product.title.includes(searchTerm) ||
-                product.description.includes(searchTerm)
-            );
-        }
-
-        // Apply price filter
-        if (activeSort === "price") {
-            if (minPrice) {
-                result = result.filter(product => product.price >= minPrice);
-            }
-            if (maxPrice) {
-                result = result.filter(product => product.price <= maxPrice);
-            }
-        }
-
-        // Apply sorting
-        result = sortProducts(result, activeSort);
-
-        setFilteredProducts(result);
     }
 
     function sortProducts(productsToSort, sortBy) {
@@ -210,34 +266,23 @@ export default function ProductOfCatigory() {
         return sorted;
     }
 
-    async function toggleWishlist(id) {
-        // <--- التحقق من تسجيل الدخول قبل أي إجراء
+    async function toggleWishlist(prodId) { // تغيير اسم المتغير إلى prodId لتجنب التضارب مع id الخاص بـ useParams
         if (!isLoggedIn) {
             toast.error("يرجى تسجيل الدخول أولاً لإدارة قائمة المفضلة.", { duration: 2000 });
-            // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
-            return; // إيقاف تنفيذ الدالة
+            return;
         }
 
         try {
-            if (isInWishlist(id)) {
-                const { data } = await deletWhichData(id);
+            if (isInWishlist(prodId)) {
+                const { data } = await deletWhichData(prodId);
                 if (data.message === "success") {
-                    toast.success("تم الإزالة", {
-                        position: "top-center",
-                        className: "border border-danger notefection p-3 bg-white text-danger notefection w-100 fw-bolder fs-4",
-                        duration: 1000,
-                        icon: "🗑️",
-                    });
+                toast.success("تم الإزالة من المفضلة", { duration: 1000  });
                 }
             } else {
-                const { data } = await addWishlist(id);
+                const { data } = await addWishlist(prodId);
                 if (data.message === "success") {
-                    toast.success("تم الإضافة", {
-                        position: "top-center",
-                        className: "border border-danger notefection p-3 bg-white text-danger w-100 fw-bolder fs-4",
-                        duration: 1000,
-                        icon: "❤️",
-                    });
+                            toast.success("تمت الإضافة إلى السلة", { duration: 1000  });
+
                 }
             }
             fetchWishlist();
@@ -250,39 +295,28 @@ export default function ProductOfCatigory() {
     const isInWishlist = (productId) =>
         wishlistItems.some((item) => item._id === productId);
 
-    async function addToChart(id, productImages, slideIndex) {
-        // <--- التحقق من تسجيل الدخول قبل أي إجراء
+    async function addToChart(prodId, productImages, slideIndex) { // تغيير اسم المتغير إلى prodId
         if (!isLoggedIn) {
             toast.error("يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة.", { duration: 2000 });
-            // setShowLoginPopup(true); // <--- تم إزالة هذا السطر
-            return; // إيقاف تنفيذ الدالة
+            return;
         }
 
         try {
             const imageToUse = productImages[slideIndex];
 
-            console.log(`جارٍ إضافة المنتج ID: ${id} إلى السلة. الصورة المختارة:`, imageToUse);
+            console.log(`جارٍ إضافة المنتج ID: ${prodId} إلى السلة. الصورة المختارة:`, imageToUse);
 
-            let { data } = await addCart(id, imageToUse);
+            let { data } = await addCart(prodId, imageToUse);
             if (data.message === "success") {
                 setCartCount(data.cartItems);
-                toast.success("تم الاضافه", {
-                    position: 'top-center',
-                    className: 'border border-success notefection  p-3 bg-white text-success  fw-bolder fs- success',
-                    duration: 1000,
-                    icon: '👏'
-                });
+                 toast.success("تمت الإضافة إلى السلة", { duration: 1000 });
             } else {
                 throw new Error("Error adding to cart");
             }
         } catch (error) {
             console.error("Error adding to cart:", error);
-            toast.error("حدث خطأ أثناء إضافة المنتج إلى السلة", {
-                position: 'top-center',
-                className: 'border border-danger notefection p-3 bg-white text-danger fw-bolder fs-4 error',
-                duration: 1000,
-                icon: '❌'
-            });
+                        toast.error("حدث خطأ أثناء الإضافة إلى السلة");
+
         }
     }
 
@@ -300,23 +334,38 @@ export default function ProductOfCatigory() {
         },
     });
 
+    // --- Infinite Scroll Effect ---
+    useEffect(() => {
+        const handleScroll = () => {
+            // تحقق مما إذا كان المستخدم في أسفل الصفحة تقريبًا
+            if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && !loading && hasMore) {
+                console.log("Fetching next page due to scroll.");
+                fetchProducts(currentPage + 1);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [currentPage, loading, hasMore, fetchProducts]);
+    // --- End Infinite Scroll Effect ---
+
     return (
         <div className="container my-3" id="product-of-subcategory">
             <div className="row">
-                <div className="col-md-12 ">
-                    <div className="sort-section mb-4 ">
+                <div className="col-md-12">
+                    <div className="sort-section mb-4">
                         <div>
                             <h2 className="text-center mb-3">الاقسام الفرعية</h2>
                             {subCatigoryOfCatigory && subCatigoryOfCatigory.length > 0 ? (
                                 <div className="d-flex flex-wrap gap-2 justify-content-center container-subCatigory">
-                                    <div className="d-flex flex-wrap gap-2 justify-content-center  container-of-subCatigory">
+                                    <div className="d-flex flex-wrap gap-2 justify-content-center container-of-subCatigory">
                                         {subCatigoryOfCatigory.map((subCat) => (
                                             <Link
                                                 key={subCat._id}
                                                 to={`/productOfSubCarigory/${subCat._id}`}
                                                 className="fs-4 fw-bold text-decoration-none subCatigory-Of-Catigory"
                                             >
-                                                {subCat.name} <spam className="slach">/</spam>
+                                                {subCat.name} <span className="slach">/</span>
                                             </Link>
                                         ))}
                                     </div>
@@ -328,7 +377,7 @@ export default function ProductOfCatigory() {
                             )}
                         </div>
                         <span className="fs-5 me-2 fw-bold">ترتيب حسب</span>
-                        <div className="d-flex flex-wrap align-items-center  sort-options">
+                        <div className="d-flex flex-wrap align-items-center sort-options">
                             {sortOptions.map(({ label, value }) => (
                                 <button
                                     key={value}
@@ -364,12 +413,14 @@ export default function ProductOfCatigory() {
                         </div>
                     </div>
 
-                    {searchTerm && filteredProducts.length === 0 && (
+                    {/* رسائل البحث والفلاتر */}
+                    {searchTerm && filteredProducts.length === 0 && !loading && (
                         <div className="alert alert-danger text-center fs-4">
                             لا توجد منتجات تطابق بحثك: "{searchTerm}"
                         </div>
                     )}
-
+                    
+                    {/* عرض المنتجات المفلترة */}
                     <div className="row">
                         {filteredProducts.map((product) => {
                             const allProductImages = product.images && product.images.length > 0
@@ -382,11 +433,9 @@ export default function ProductOfCatigory() {
                                 <div key={product._id} className="col-6 col-md-6 col-lg-3 mb-4">
                                     <div className="card product-card h-100 position-relative">
                                         <div className="position-relative product-image-wrapper">
-                                            {/* استخدام Swiper بدلًا من Slider */}
                                             <Swiper {...productSwiperSettings(product._id)}>
                                                 {allProductImages.map((imgSrc, index) => (
                                                     <SwiperSlide key={index}>
-                                                        {/* تصغير الصورة أكتر على الموبايل */}
                                                         <img src={imgSrc} className="card-img-top product-image img-fluid" alt={`${product.title} - ${index + 1}`} />
                                                     </SwiperSlide>
                                                 ))}
@@ -416,7 +465,6 @@ export default function ProductOfCatigory() {
                                         </div>
 
                                         <div className="card-body py-2">
-                                            {/* تصغير حجم الخط للعناوين على الموبايل */}
                                             <h6 className="card-subtitle mb-1 text-muted fs-6 fw-bold">{product.title?.split(" ").slice(0, 2).join(" ")}</h6>
                                             <h5 className="card-title fs-6 mb-1">
                                                 {product.description?.split(" ").slice(0, 2).join(" ")}
@@ -459,11 +507,30 @@ export default function ProductOfCatigory() {
                             );
                         })}
                     </div>
+
+                    {/* مؤشر التحميل */}
+                 {loading && (
+                        <div className="text-center my-3">
+                            <div className="spinner-border text-danger" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="text-muted">جاري تحميل المزيد من المنتجات...</p>
+                        </div>
+                    )}
+                    {!hasMore && !loading && filteredProducts.length > 0 && (
+                        <div className="text-center my-3 text-muted">
+                            لقد وصلت إلى نهاية قائمة المنتجات.
+                        </div>
+                    )}
+
+                    {/* رسالة عند عدم وجود منتجات على الإطلاق في الفئة الحالية أو بعد تطبيق فلاتر/بحث */}
+                    {filteredProducts.length === 0 && !loading && searchTerm === "" && (
+                        <div className="alert alert-info text-center fs-4">
+                            لا توجد منتجات متاحة حالياً في هذه الفئة.
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {/* <--- تم إزالة تضمين الـ Login Pop-up هنا ---> */}
-            {/* {showLoginPopup && <LoginPopup onClose={() => { setShowLoginPopup(false); checkLoginStatus(); }} />} */}
         </div>
     );
 }

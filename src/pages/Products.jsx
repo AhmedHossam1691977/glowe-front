@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import image from "./../assets/silver-crystal-branch-with-plate-makeup-brushes-lipstick-white-background_23-2148129421.avif";
 import "./../style/procust.css";
 import { Link, useLocation } from "react-router-dom";
@@ -15,6 +15,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import { Circles } from 'react-loader-spinner'; // افتراضيًا، ستحتاج إلى تثبيت هذه المكتبة
 
 export default function ProductOffer() {
   const [activeSort, setActiveSort] = useState("title");
@@ -25,6 +26,11 @@ export default function ProductOffer() {
   const [wishlistItems, setWishlistItems] = useState([]);
   const [activeSlideIndices, setActiveSlideIndices] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const basUrl = "https://final-pro-api-j1v7.onrender.com";
   const { product: searchTerm } = useContext(productContext);
@@ -48,9 +54,14 @@ export default function ProductOffer() {
     { label: "السعر", value: "price" },
   ];
 
+  // Reset pagination and fetch new products when sort/filter options change
   useEffect(() => {
-    allProducts();
-  }, [activeSort, minPrice, maxPrice]);
+    setProducts([]); // Clear existing products
+    setFilteredProducts([]); // Clear existing filtered products
+    setCurrentPage(1); // Reset to first page
+    setHasMore(true); // Assume there's more data to load initially
+    allProducts(1); // Fetch products for the first page
+  }, [activeSort, minPrice, maxPrice]); // Depend on sort and price filters
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -60,19 +71,26 @@ export default function ProductOffer() {
     }
   }, [isLoggedIn]);
 
+  // Effect for search term filtering on already loaded products
   useEffect(() => {
-    if (searchTerm) {
+    // التحقق من أن searchTerm هو سلسلة نصية قبل استخدام toLowerCase()
+    const currentSearchTerm = searchTerm ? String(searchTerm) : ''; 
+
+    if (currentSearchTerm) {
       const filtered = products.filter(product =>
-        product.title.includes(searchTerm) ||
-        product.description.includes(searchTerm)
+        product.title.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(currentSearchTerm.toLowerCase())
       );
       setFilteredProducts(filtered);
     } else {
-      setFilteredProducts(products);
+      setFilteredProducts(products); // If no search term, show all loaded products
     }
   }, [searchTerm, products]);
 
-  async function allProducts() {
+  const allProducts = useCallback(async (page) => {
+    if (loading || !hasMore) return; // Prevent multiple simultaneous fetches or if no more data
+
+    setLoading(true);
     try {
       const params = new URLSearchParams();
       if (activeSort && activeSort !== "date") {
@@ -82,24 +100,44 @@ export default function ProductOffer() {
         if (minPrice) params.append("price[gte]", minPrice);
         if (maxPrice) params.append("price[lte]", maxPrice);
       }
+      params.append("page", page); // Add page parameter
+      params.append("limit", 8); // Limit items per page, adjust as needed
+
       const url =
         activeSort === "date"
-          ? `${basUrl}/api/v1/product?sort=-createdAt`
+          ? `${basUrl}/api/v1/product?sort=-createdAt&${params.toString()}`
           : `${basUrl}/api/v1/product?${params.toString()}`;
 
       const { data } = await axios.get(url);
-      setProducts(data.product);
-      setFilteredProducts(data.product);
+
+      if (data.product.length > 0) {
+        setProducts(prevProducts => {
+          const newProducts = [...prevProducts, ...data.product];
+          // Ensure no duplicates if API returns them
+          const uniqueProducts = Array.from(newProducts.reduce((map, obj) => map.set(obj._id, obj), new Map()).values());
+          return uniqueProducts;
+        });
+        setCurrentPage(page);
+        if (data.product.length < 8) { // If fewer than limit, assume no more data
+          setHasMore(false);
+        }
+      } else {
+        setHasMore(false); // No more products to load
+      }
 
       const initialActiveSlides = {};
       data.product.forEach(p => {
         initialActiveSlides[p._id] = 0;
       });
-      setActiveSlideIndices(initialActiveSlides);
+      setActiveSlideIndices(prev => ({ ...prev, ...initialActiveSlides }));
+
     } catch (error) {
       console.error("Error fetching products:", error);
+      setHasMore(false); // Stop trying to fetch if there's an error
+    } finally {
+      setLoading(false);
     }
-  }
+  }, [activeSort, minPrice, maxPrice, hasMore, loading, basUrl]);
 
   async function fetchWishlist() {
     try {
@@ -119,12 +157,12 @@ export default function ProductOffer() {
       if (isInWishlist(id)) {
         const { data } = await deletWhichData(id);
         if (data.message === "success") {
-          toast.success("تم الإزالة", { duration: 1000, icon: "🗑️" });
+          toast.success("تم الإزالة", { duration: 1000 });
         }
       } else {
         const { data } = await addWishlist(id);
         if (data.message === "success") {
-          toast.success("تم الإضافة", { duration: 1000, icon: "❤️" });
+          toast.success("تم الإضافة", { duration: 1000,  });
         }
       }
       fetchWishlist();
@@ -169,6 +207,19 @@ export default function ProductOffer() {
       }));
     },
   });
+
+  // Infinite scroll logic
+  useEffect(() => {
+    const handleScroll = () => {
+      // Check if user is at the bottom of the page
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && !loading && hasMore) {
+        allProducts(currentPage + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [currentPage, loading, hasMore, allProducts]);
 
   return (
     <div className="container my-3" id="products">
@@ -246,11 +297,11 @@ export default function ProductOffer() {
                           </span>
                         </Link>
                       </div>
-                      {product.priceAfterDiscount ?  (
+                      {product.priceAfterDiscount ? (
                         <span className="discount-badge" style={{ fontSize: '0.75rem' }}>
                           خصم {Math.round(100 - (product.priceAfterDiscount / product.price) * 100)}%
                         </span>
-                      ):""}
+                      ) : ""}
                     </div>
                     <div className="card-body py-2">
                       <h6 className="card-subtitle mb-1 text-muted fs-6 fw-bold">
@@ -260,11 +311,11 @@ export default function ProductOffer() {
                         <span className="text-danger fs-6 fw-bold">
                           {`${product.priceAfterDiscount || product.price} ج.م`}
                         </span>
-                       {product.priceAfterDiscount ?(
+                        {product.priceAfterDiscount ? (
                           <span className="text-decoration-line-through mx-1 text-muted ms-1 fs-7">
                             {product.price} ج.م
                           </span>
-                        ) :""}
+                        ) : ""}
                       </div>
                       <div className="product-rating mb-2 fs-6 d-flex align-items-center">
                         {[...Array(5)].map((_, i) => (
@@ -285,7 +336,21 @@ export default function ProductOffer() {
             })}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {loading && (
+                        <div className="text-center my-3">
+                            <div className="spinner-border text-danger" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="text-muted">جاري تحميل المزيد من المنتجات...</p>
+                        </div>
+                    )}
+                    {!hasMore && !loading && filteredProducts.length > 0 && (
+                        <div className="text-center my-3 text-muted">
+                            لقد وصلت إلى نهاية قائمة المنتجات.
+                        </div>
+                    )}
+
+          {filteredProducts.length === 0 && !loading && searchTerm === "" && (
             <div className="alert alert-info text-center fs-4">
               لا توجد منتجات متاحة حالياً
             </div>
